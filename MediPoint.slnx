@@ -1,8 +1,11 @@
 <Solution>
-  <Folder Name="/src/">
-    <Project Path="src/MediPoint.Api/MediPoint.Api.csproj" />
-    <Project Path="src/MediPoint.Application/MediPoint.Application.csproj" />
+  <Folder Name="/src/" />
+  <Folder Name="/src/Core/">
     <Project Path="src/MediPoint.Domain/MediPoint.Domain.csproj" />
     <Project Path="src/MediPoint.Infrastructure/MediPoint.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Presentation/">
+    <Project Path="src/MediPoint.Api/MediPoint.Api.csproj" />
+    <Project Path="src/MediPoint.Application/MediPoint.Application.csproj" />
   </Folder>
 </Solution>

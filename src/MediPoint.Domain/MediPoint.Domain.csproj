@@ -7,9 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="Entities\Appointments\Apointment.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="MediatR" Version="14.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.10" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.10" />
   </ItemGroup>
 
 </Project>
