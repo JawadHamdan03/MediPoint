@@ -1,4 +1,5 @@
 ﻿using MediPoint.Domain.Entities.Apointments;
+using MediPoint.Domain.Entities.Prescriptions;
 using MediPoint.Domain.Entities.User.Shared;
 using System;
 using System.Collections.Generic;
@@ -18,4 +19,5 @@ public class Patient : BaseUser
 
 
     public List<Appointment> Appointments { get; set; }= new List<Appointment>();
+    public List<Prescription> Prescriptions { get; set; } = new List<Prescription>();
 }
