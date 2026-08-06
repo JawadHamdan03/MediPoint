@@ -1,4 +1,6 @@
-﻿using System;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -6,6 +8,10 @@ namespace MediPoint.Domain.Entities.MedicalRecords;
 
 public class MedicalRecord
 {
+    [BsonId]
+    [BsonRepresentation(BsonType.ObjectId)]
+    public string? Id { get; set; }
+
     public Guid PatientId { get; set; }
 
     public Guid DoctorId { get; set; }

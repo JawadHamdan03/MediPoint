@@ -1,4 +1,5 @@
 ﻿using MediPoint.Domain.Common;
+using MediPoint.Domain.Entities.RefreshToken;
 using MediPoint.Domain.Entities.User.Shared;
 using Microsoft.AspNetCore.Identity;
 using System;
@@ -9,5 +10,5 @@ namespace MediPoint.Domain.Entities.User;
 
 public class Admin : BaseUser
 {
-
+    public List<AdminRefreshToken> AdminRefreshTokens { get; set; }
 }

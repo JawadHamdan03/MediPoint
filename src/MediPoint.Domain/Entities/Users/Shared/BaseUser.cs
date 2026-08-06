@@ -21,6 +21,5 @@ public class BaseUser : BaseEntity
     public DateOnly DateOfBirth { get; set; }
 
     public Gender Gender { get; set; }
-    public bool IsActive { get; set; } = true;
 
 }
