@@ -9,6 +9,7 @@ using MediPoint.Infrastructure.Common.Services;
 using MediPoint.Infrastructure.Common.Utils;
 using MediPoint.Infrastructure.Data;
 using MediPoint.Infrastructure.MongoData;
+using MediPoint.Infrastructure.MongoData.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -24,6 +25,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<IAppDbContext,AppDbContext>();
 builder.Services.Configure<MongoDbContext>(
     builder.Configuration.GetSection("MediPoint"));
+builder.Services.AddSingleton<IMedicalRecordsService,MedicalRecordService>();
+builder.Services.AddSingleton<IMedicineService,MedicineService>();
+builder.Services.AddSingleton<ILabResultService,LabResultService>();
+
 
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
