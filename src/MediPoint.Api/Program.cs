@@ -5,12 +5,16 @@ using MediPoint.Application;
 using MediPoint.Application.Common;
 using MediPoint.Application.Common.Behaviors;
 using MediPoint.Application.Common.Services;
+using MediPoint.Application.Features.CreateLabResult;
+using MediPoint.Application.Features.CreateLabResult.DTOs;
 using MediPoint.Infrastructure.Common.Services;
 using MediPoint.Infrastructure.Common.Utils;
 using MediPoint.Infrastructure.Data;
 using MediPoint.Infrastructure.MongoData;
 using MediPoint.Infrastructure.MongoData.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
@@ -96,5 +100,12 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
+
+
+app.MapPost("/lab-result",[Authorize(Roles ="Admin")] async ([FromBody]LabResultRequest request,IMediator mediator) => 
+{
+    var res = await mediator.Send(new CreateLabResultCommand(request));
+    return Results.Ok(res);
+});
 app.Run();
 

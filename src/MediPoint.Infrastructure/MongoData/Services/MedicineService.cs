@@ -13,7 +13,7 @@ public class MedicineService(IOptions<MongoDbContext> mongoDbContext):IMedicineS
 {
     private readonly IMongoCollection<Medicine> _medicineCollection = new MongoClient(mongoDbContext.Value.ConnectionString)
        .GetDatabase(mongoDbContext.Value.DatabaseName)
-       .GetCollection<Medicine>(mongoDbContext.Value.MedicalRecordsCollectionName);
+       .GetCollection<Medicine>(mongoDbContext.Value.MedicineCollectionName);
 
 
     public async Task<List<Medicine>> GetAsync() =>

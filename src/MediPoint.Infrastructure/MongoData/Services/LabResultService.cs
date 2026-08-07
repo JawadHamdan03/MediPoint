@@ -13,7 +13,7 @@ public class LabResultService(IOptions<MongoDbContext> mongoDbContext):ILabResul
 {
     private readonly IMongoCollection<LabResult> _labResultsCollection = new MongoClient(mongoDbContext.Value.ConnectionString)
        .GetDatabase(mongoDbContext.Value.DatabaseName)
-       .GetCollection<LabResult>(mongoDbContext.Value.MedicalRecordsCollectionName);
+       .GetCollection<LabResult>(mongoDbContext.Value.LabResultsCollectionName);
 
 
     public async Task<List<LabResult>> GetAsync() =>
