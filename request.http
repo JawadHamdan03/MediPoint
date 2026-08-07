@@ -1,0 +1,11 @@
+@baseUrl = https://localhost:7213
+
+
+###
+POST {{baseUrl}}/api/Account/login
+Content-Type: application/json
+
+{
+    "email":"admin@medipoint.com",
+    "password":"Admn@123"
+} 

@@ -1,6 +1,11 @@
-@MediPoint.Api_HostAddress = http://localhost:5145
+@baseUrl = https://localhost:7213
 
-GET {{MediPoint.Api_HostAddress}}/weatherforecast/
-Accept: application/json
 
 ###
+POST {{baseUrl}}/api/Account
+Content-Type: application/json
+
+{
+    "email":"jasdasdas",
+    "password":"32165456465"
+} 

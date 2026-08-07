@@ -1,9 +1,18 @@
+using System.Text;
+using FluentValidation;
+using MediatR;
+using MediPoint.Application;
+using MediPoint.Application.Common;
+using MediPoint.Application.Common.Behaviors;
 using MediPoint.Application.Common.Services;
 using MediPoint.Infrastructure.Common.Services;
 using MediPoint.Infrastructure.Common.Utils;
 using MediPoint.Infrastructure.Data;
 using MediPoint.Infrastructure.MongoData;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +21,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+builder.Services.AddScoped<IAppDbContext,AppDbContext>();
 builder.Services.Configure<MongoDbContext>(
     builder.Configuration.GetSection("MediPoint"));
 
@@ -24,8 +34,37 @@ builder.Services.AddScoped<IJwtTokenServiceProvider, JwtTokenServiceProvider>();
 
 builder.Services.AddOpenApi();
 
+builder.Services.AddMediatR(options =>
+{
+    options.RegisterServicesFromAssembly(typeof(IAssemblyMarker).Assembly);
+});
 
+builder.Services.AddValidatorsFromAssembly(typeof(IAssemblyMarker).Assembly);
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>),typeof(ValidationBehavior<,>));
 
+builder.Services.AddAuthentication(options =>
+{
+      options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    var JwtSettings = builder.Configuration.GetSection("JwtSettings");
+    var secretKey = JwtSettings["SecretKey"];
+     options.TokenValidationParameters = new()
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ClockSkew = TimeSpan.Zero,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = JwtSettings["Issuer"],
+        ValidAudience = JwtSettings["Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey!)),
+
+    };
+});
+
+builder.Services.AddAuthorization();
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -44,9 +83,12 @@ using (var scope = app.Services.CreateScope())
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.MapScalarApiReference();
 }
 
 app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
 
 app.Run();

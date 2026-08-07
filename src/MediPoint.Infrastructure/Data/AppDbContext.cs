@@ -1,4 +1,5 @@
-﻿using MediPoint.Domain.Entities.Apointments;
+﻿using MediPoint.Application.Common;
+using MediPoint.Domain.Entities.Apointments;
 using MediPoint.Domain.Entities.MedicalRecords;
 using MediPoint.Domain.Entities.Prescriptions;
 using MediPoint.Domain.Entities.Prescriptions.LabRes;
@@ -14,7 +15,7 @@ using System.Text;
 
 namespace MediPoint.Infrastructure.Data;
 
-public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
+public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options),IAppDbContext
 {
     public DbSet<Admin> Admins { get; set; }
     public DbSet<Doctor> Doctors { get; set; }
