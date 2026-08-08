@@ -1,4 +1,6 @@
-﻿using MediPoint.Domain.Entities.User;
+﻿using MediPoint.Domain.Entities.Apointments;
+using MediPoint.Domain.Entities.Appointments.Enums;
+using MediPoint.Domain.Entities.User;
 using MediPoint.Domain.Entities.User.Shared.Enums;
 using MediPoint.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -242,6 +244,103 @@ public static class UsersDataSeed
             };
 
             await dbContext.Patients.AddRangeAsync(patients);
+        }
+
+        // Seed Appointments
+        if (!(await dbContext.Appointments.AnyAsync()))
+        {
+            // Get doctors and patients for reference
+            var doctors = await dbContext.Doctors.ToListAsync();
+            var patients = await dbContext.Patients.ToListAsync();
+
+            if (doctors.Count > 0 && patients.Count > 0)
+            {
+                var appointments = new List<Appointment>
+                {
+                    new Appointment
+                    {
+                        PatientId = patients[0].Id,
+                        DoctorId = doctors[0].Id,
+                        AppointmentDate = DateTime.Now.AddDays(5).AddHours(10),
+                        Duration = 30,
+                        Status = AppointmentStatus.Confirmed,
+                        Reason = "General Checkup",
+                        Notes = "Patient scheduled for routine heart examination."
+                    },
+                    new Appointment
+                    {
+                        PatientId = patients[1].Id,
+                        DoctorId = doctors[1].Id,
+                        AppointmentDate = DateTime.Now.AddDays(3).AddHours(14),
+                        Duration = 30,
+                        Status = AppointmentStatus.Confirmed,
+                        Reason = "Child Health Checkup",
+                        Notes = "Annual pediatric examination."
+                    },
+                    new Appointment
+                    {
+                        PatientId = patients[2].Id,
+                        DoctorId = doctors[2].Id,
+                        AppointmentDate = DateTime.Now.AddDays(7).AddHours(11),
+                        Duration = 45,
+                        Status = AppointmentStatus.Pending,
+                        Reason = "Joint Pain Assessment",
+                        Notes = "Patient reports knee pain after sports injury."
+                    },
+                    new Appointment
+                    {
+                        PatientId = patients[3].Id,
+                        DoctorId = doctors[3].Id,
+                        AppointmentDate = DateTime.Now.AddDays(10).AddHours(09),
+                        Duration = 30,
+                        Status = AppointmentStatus.Confirmed,
+                        Reason = "Skin Condition Evaluation",
+                        Notes = "Follow-up appointment for dermatological treatment."
+                    },
+                    new Appointment
+                    {
+                        PatientId = patients[4].Id,
+                        DoctorId = doctors[4].Id,
+                        AppointmentDate = DateTime.Now.AddDays(2).AddHours(15),
+                        Duration = 45,
+                        Status = AppointmentStatus.Confirmed,
+                        Reason = "Neurological Examination",
+                        Notes = "Patient experiencing occasional headaches."
+                    },
+                    new Appointment
+                    {
+                        PatientId = patients[5].Id,
+                        DoctorId = doctors[0].Id,
+                        AppointmentDate = DateTime.Now.AddDays(6).AddHours(13),
+                        Duration = 30,
+                        Status = AppointmentStatus.Pending,
+                        Reason = "Cardiac Consultation",
+                        Notes = "Initial consultation for heart health assessment."
+                    },
+                    new Appointment
+                    {
+                        PatientId = patients[0].Id,
+                        DoctorId = doctors[1].Id,
+                        AppointmentDate = DateTime.Now.AddDays(-5).AddHours(10),
+                        Duration = 30,
+                        Status = AppointmentStatus.Completed,
+                        Reason = "Follow-up Visit",
+                        Notes = "Completed routine examination."
+                    },
+                    new Appointment
+                    {
+                        PatientId = patients[1].Id,
+                        DoctorId = doctors[2].Id,
+                        AppointmentDate = DateTime.Now.AddDays(8).AddHours(16),
+                        Duration = 30,
+                        Status = AppointmentStatus.Cancelled,
+                        Reason = "Joint Surgery Consultation",
+                        CancellationReason = "Patient requested to reschedule."
+                    }
+                };
+
+                await dbContext.Appointments.AddRangeAsync(appointments);
+            }
         }
 
         await dbContext.SaveChangesAsync();
