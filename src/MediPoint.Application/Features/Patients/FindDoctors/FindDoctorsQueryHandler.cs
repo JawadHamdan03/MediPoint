@@ -2,6 +2,7 @@
 using Mapster;
 using MediatR;
 using MediPoint.Application.Common;
+using MediPoint.Application.Common.Exceptions;
 using MediPoint.Application.Features.Patients.DTOs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -19,7 +20,7 @@ public class FindDoctorsQueryHandler(IAppDbContext dbContext,ILogger<FindDoctors
         if (doctors is null)
         {
             logger.LogInformation("No doctors were found");
-            throw new Exception("no doctors were found for this speciality");
+            throw new NotFoundException("Doctor",request.speciality);
         }
         List<DoctorResponse> res = [];
         foreach (var doc in doctors)

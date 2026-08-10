@@ -19,6 +19,8 @@ public class MedicalRecordService(IOptions<MongoDbContext> mongoDbContext):IMedi
 
     public async Task<MedicalRecord?> GetAsync(string id) =>
         await _MedicalRecordsCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
+    public async Task<MedicalRecord?> GetByPatientIdAsync(Guid patientId) =>
+        await _MedicalRecordsCollection.Find(x => x.PatientId == patientId).FirstOrDefaultAsync();
 
     public async Task CreateAsync(MedicalRecord medRecord) =>
         await _MedicalRecordsCollection.InsertOneAsync(medRecord);

@@ -2,6 +2,7 @@
 using DnsClient.Internal;
 using MediatR;
 using MediPoint.Application.Common;
+using MediPoint.Application.Common.Exceptions;
 using MediPoint.Application.Common.ServiceResponse;
 using MediPoint.Application.Common.Services;
 using Microsoft.EntityFrameworkCore;
@@ -23,7 +24,7 @@ public class PatientLoginCommandHandler(IAppDbContext dbContext,IJwtTokenService
         if (user is null)
         {
             logger.LogError("User with Email {Email} Not Found",request.LoginRequest.Email);
-            throw new Exception("User were not found");
+            throw new NotFoundException("Patient",request.LoginRequest.Email);
         }
         bool loginRes =  BCrypt.Net.BCrypt.Verify(request.LoginRequest.Password, user.PasswordHash);
         

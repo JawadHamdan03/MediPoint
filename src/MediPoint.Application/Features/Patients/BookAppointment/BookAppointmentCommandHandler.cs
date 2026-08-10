@@ -1,6 +1,7 @@
 ﻿using DnsClient.Internal;
 using MediatR;
 using MediPoint.Application.Common;
+using MediPoint.Application.Common.Exceptions;
 using MediPoint.Application.Features.Patients.DTOs;
 using MediPoint.Domain.Entities.Apointments;
 using MediPoint.Domain.Entities.Appointments.Enums;
@@ -19,7 +20,7 @@ public class BookAppointmentCommandHandler(IAppDbContext dbContext,ILogger<BookA
         if (appointment is null)
         {
             logger.LogError("No Appointment with {AppointmentId} were found", request.Request.AppointmentId);
-            throw new Exception("this appointment was not found");
+            throw new NotFoundException("Appointment", request.Request.AppointmentId.ToString());
         }
         if (appointment.Status == AppointmentStatus.Confirmed || appointment.Status == AppointmentStatus.Completed || appointment.Status == AppointmentStatus.Cancelled)
             throw new Exception("Can't book this Appointment choose another one");    

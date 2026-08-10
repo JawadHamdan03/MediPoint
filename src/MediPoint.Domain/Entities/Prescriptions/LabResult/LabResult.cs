@@ -11,8 +11,9 @@ public class LabResult
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
     public string? Id { get; set; }
+    public Guid PrescriptionId { get; set; }
+    public Guid PatientId { get; set; }
     public string TestName { get; set; } = null!;
-
     public string Result { get; set; } = null!;
 
     public string Unit { get; set; } = "";

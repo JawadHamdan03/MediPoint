@@ -1,6 +1,7 @@
 using System.Text;
 using FluentValidation;
 using MediatR;
+using MediPoint.Api.Exceptions;
 using MediPoint.Application;
 using MediPoint.Application.Common;
 using MediPoint.Application.Common.Behaviors;
@@ -13,6 +14,7 @@ using MediPoint.Infrastructure.MongoData;
 using MediPoint.Infrastructure.MongoData.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -39,6 +41,19 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 });
 
 builder.Services.AddScoped<IJwtTokenServiceProvider, JwtTokenServiceProvider>();
+builder.Services.AddProblemDetails(options =>
+{
+    options.CustomizeProblemDetails = context =>
+    {
+        context.ProblemDetails.Instance =
+        $"{context.HttpContext.Request.Method} {context.HttpContext.Request.Path}";
+
+        context.ProblemDetails.Extensions.TryAdd("requestId",context.HttpContext.TraceIdentifier);
+        var activity = context.HttpContext.Features.Get<IHttpActivityFeature>()?.Activity;
+        context.ProblemDetails.Extensions.TryAdd("traceId",activity?.Id);
+    };
+});
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 builder.Services.AddOpenApi();
 
@@ -93,7 +108,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.MapScalarApiReference();
 }
-
+app.UseExceptionHandler();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();

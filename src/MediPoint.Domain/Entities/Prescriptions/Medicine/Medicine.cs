@@ -11,6 +11,8 @@ public class Medicine
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
     public string? Id { get; set; }
+    public Guid PrescriptionId { get; set; }
+    public Guid PatientId { get; set; }
     public string Name { get; set; } = null!;
 
     public string Dosage { get; set; } = null!;
