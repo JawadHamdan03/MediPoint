@@ -259,9 +259,9 @@ public static class UsersDataSeed
                 {
                     new Appointment
                     {
-                        PatientId = patients[0].Id,
+                        PatientId = patients[2].Id,
                         DoctorId = doctors[0].Id,
-                        AppointmentDate = DateTime.Now.AddDays(5).AddHours(10),
+                        AppointmentDate = DateTime.Now.AddHours(1),
                         Duration = 30,
                         Status = AppointmentStatus.Confirmed,
                         Reason = "General Checkup",

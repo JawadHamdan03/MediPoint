@@ -31,7 +31,7 @@ public class PatientLoginCommandHandler(IAppDbContext dbContext,IJwtTokenService
         if (!loginRes)
         {
             logger.LogWarning("User Login with Email {Email} entered wrong password", request.LoginRequest.Email);
-            throw new Exception("Wrong Password");
+            throw new WrongPasswordException(user.PasswordHash);
         }
 
         logger.LogInformation("User with Email {Email} just Logged in",request.LoginRequest.Email);

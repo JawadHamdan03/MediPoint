@@ -96,7 +96,7 @@ using (var scope = app.Services.CreateScope())
     var dbContext = services.GetRequiredService<AppDbContext>();
 
     // Apply pending migrations
-    await dbContext.Database.MigrateAsync();
+    //await dbContext.Database.MigrateAsync();
 
     // Seed roles and admin user
     await UsersDataSeed.SeedUsers(services);

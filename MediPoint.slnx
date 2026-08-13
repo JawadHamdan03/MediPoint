@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="medipoint-api.openapi.json" />
+  </Folder>
   <Folder Name="/src/">
     <Project Path="src/MediPoint.Api/MediPoint.Api.csproj" />
     <Project Path="src/MediPoint.Application/MediPoint.Application.csproj" />

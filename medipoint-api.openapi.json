@@ -1,0 +1,200 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "MediPoint API",
+    "description": "Endpoints for the MediPoint application. Import this file into Apidog (Import Data > OpenAPI).",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://localhost:7213",
+      "description": "Local development (HTTPS)"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Patients",
+      "description": "Patient-facing endpoints"
+    }
+  ],
+  "paths": {
+    "/patients/login": {
+      "post": {
+        "tags": ["Patients"],
+        "summary": "Patient login",
+        "description": "Authenticates a patient and returns JWT access/refresh tokens.",
+        "operationId": "patientLogin",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/LoginRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/JwtTokenResponse" }
+              }
+            }
+          },
+          "400": { "description": "Validation error" },
+          "401": { "description": "Invalid credentials" }
+        }
+      }
+    },
+    "/patients/refresh-token": {
+      "post": {
+        "tags": ["Patients"],
+        "summary": "Refresh patient token",
+        "description": "Exchanges a valid refresh token for a new access/refresh token pair.",
+        "operationId": "refreshPatientToken",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/RefreshTokenRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Token refreshed",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/JwtTokenResponse" }
+              }
+            }
+          },
+          "400": { "description": "Validation error" },
+          "401": { "description": "Invalid or expired refresh token" }
+        }
+      }
+    },
+    "/patients/search-doctors/{speciality}": {
+      "get": {
+        "tags": ["Patients"],
+        "summary": "Search doctors by speciality",
+        "description": "Returns doctors matching the given speciality, including their available appointments. Requires the Patient role.",
+        "operationId": "findDoctors",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "speciality",
+            "in": "path",
+            "required": true,
+            "description": "Doctor speciality to search for (e.g. Cardiology).",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Matching doctors",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/DoctorResponse" }
+                }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden (not a Patient)" }
+        }
+      }
+    },
+    "/patients/book-appointment/{appointmentId}": {
+      "post": {
+        "tags": ["Patients"],
+        "summary": "Book an appointment",
+        "description": "Books the given appointment for the authenticated patient. The patient id is taken from the JWT. Requires the Patient role.",
+        "operationId": "bookAppointment",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "appointmentId",
+            "in": "path",
+            "required": true,
+            "description": "Id of the appointment to book.",
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Appointment booked" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden (not a Patient)" },
+          "404": { "description": "Appointment not found" }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "LoginRequest": {
+        "type": "object",
+        "required": ["email", "password"],
+        "properties": {
+          "email": { "type": "string", "example": "patient@medipoint.com" },
+          "password": { "type": "string", "example": "P@ssw0rd!" }
+        }
+      },
+      "RefreshTokenRequest": {
+        "type": "object",
+        "required": ["refreshToken"],
+        "properties": {
+          "refreshToken": { "type": "string", "example": "eyJhbGciOiJI..." }
+        }
+      },
+      "JwtTokenResponse": {
+        "type": "object",
+        "properties": {
+          "accessToken": { "type": "string" },
+          "refreshToken": { "type": "string" }
+        }
+      },
+      "AppointmentStatus": {
+        "type": "string",
+        "description": "Appointment status (serialized as string).",
+        "enum": ["Available", "Booked", "Completed", "Cancelled"]
+      },
+      "AppointmentDTO": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "appointmentDate": { "type": "string", "format": "date-time" },
+          "duration": { "type": "integer", "format": "int32" },
+          "status": { "$ref": "#/components/schemas/AppointmentStatus" }
+        }
+      },
+      "DoctorResponse": {
+        "type": "object",
+        "properties": {
+          "firstName": { "type": "string" },
+          "lastName": { "type": "string" },
+          "email": { "type": "string" },
+          "phoneNumber": { "type": "string" },
+          "specialty": { "type": "string" },
+          "licenseNumber": { "type": "string" },
+          "yearsOfExperience": { "type": "integer", "format": "int32" },
+          "consultationFee": { "type": "number", "format": "double" },
+          "biography": { "type": "string" },
+          "appointmentDTOs": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/AppointmentDTO" }
+          }
+        }
+      }
+    }
+  }
+}

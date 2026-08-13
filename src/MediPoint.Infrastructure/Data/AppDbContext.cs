@@ -21,7 +21,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Doctor> Doctors { get; set; }
     public DbSet<Patient> Patients { get; set; }
     public DbSet<Appointment> Appointments { get; set; }
-
+    public DbSet<Prescription> Prescriptions { get; set; }
     public DbSet<AdminRefreshToken> AdminRefreshTokens { get; set; }
     public DbSet<PatientRefreshToken> PatientRefreshTokens { get; set; }
     public DbSet<DoctorRefreshToken> DoctorRefreshTokens { get; set; }
