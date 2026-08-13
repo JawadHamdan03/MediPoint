@@ -49,6 +49,7 @@ public static class UsersDataSeed
             };
 
             await dbContext.Admins.AddRangeAsync(admins);
+            await dbContext.SaveChangesAsync();
         }
 
         // Seed Doctors
@@ -144,6 +145,7 @@ public static class UsersDataSeed
             };
 
             await dbContext.Doctors.AddRangeAsync(doctors);
+            await dbContext.SaveChangesAsync();
         }
 
         // Seed Patients
@@ -244,14 +246,15 @@ public static class UsersDataSeed
             };
 
             await dbContext.Patients.AddRangeAsync(patients);
+            await dbContext.SaveChangesAsync();
         }
 
         // Seed Appointments
         if (!(await dbContext.Appointments.AnyAsync()))
         {
             // Get doctors and patients for reference
-            var doctors = await dbContext.Doctors.ToListAsync();
-            var patients = await dbContext.Patients.ToListAsync();
+            var doctors = await dbContext.Doctors.AsNoTracking().ToListAsync();
+            var patients = await dbContext.Patients.AsNoTracking().ToListAsync();
 
             if (doctors.Count > 0 && patients.Count > 0)
             {

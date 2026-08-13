@@ -16,7 +16,7 @@ public class GetTodaysAppointmentsQueryHandler(IAppDbContext dbContext,ILogger<G
     public async Task<List<AppointmentResponse>> Handle(GetTodaysAppointmentsQuery request, CancellationToken cancellationToken)
     {
         var doc = await dbContext.Doctors
-            .Include(d => d.Appointments)
+            .AsNoTracking()
             .FirstOrDefaultAsync(d => d.Id.Equals(request.DoctorId), cancellationToken);
 
         if (doc is null)
@@ -25,15 +25,14 @@ public class GetTodaysAppointmentsQueryHandler(IAppDbContext dbContext,ILogger<G
             throw new NotFoundException("Doctor", request.DoctorId.ToString());
         }
 
-        DateTime today = DateTime.Today;
-        DateTime tomorrow = today.AddDays(1);
+        var today = DateTime.Today;
 
-        var apps =  dbContext.Appointments
-            .Where(a => a.DoctorId == request.DoctorId && a.AppointmentDate >= today && a.AppointmentDate < tomorrow);
+        var appointments = await dbContext.Appointments
+            .AsNoTracking()
+            .Where(a => a.DoctorId == request.DoctorId && a.AppointmentDate.Date == today.Date)
+            .OrderBy(a => a.AppointmentDate)
+            .ToListAsync(cancellationToken);
 
-        Console.WriteLine(apps.ToQueryString());
-
-        var res = apps.Adapt<List<AppointmentResponse>>();
-        return res;
+        return appointments.Adapt<List<AppointmentResponse>>();
     }
 }
