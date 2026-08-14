@@ -10,6 +10,6 @@ public class ApponitmentDTO
     public Guid Id { get; set; }
     public DateTime AppointmentDate { get; set; }
     public int Duration { get; set; }
-
+    public Guid DoctorId { get; set; }
     public AppointmentStatus Status { get; set; }
 }

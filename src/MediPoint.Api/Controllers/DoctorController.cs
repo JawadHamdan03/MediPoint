@@ -7,6 +7,7 @@ using MediPoint.Application.Features.Patients.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using MediPoint.Application.Features.Doctors.AddAppointment;
 
 namespace MediPoint.Api.Controllers;
 
@@ -36,10 +37,19 @@ public class DoctorController(IMediator mediator) : ControllerBase
     }
 
 
+    [Authorize(Roles = "Doctor")]
     [HttpPost("add-prescription")]
     public async Task<IActionResult> addPrescription(PrescriptionRequest prescriptionRequest)
     {
         var res = await mediator.Send(new AddPrescriptionCommand(prescriptionRequest));
+        return Ok(res);
+    }
+
+    [Authorize(Roles = "Doctor")]
+    [HttpPost("add-appointment")]
+    public async Task<IActionResult> addAppointment(MediPoint.Application.Features.Doctors.AddAppointment.DTOs.ApponitmentDTO appointment)
+    {
+        var res = await mediator.Send(new AddAppointmentCommand(appointment));
         return Ok(res);
     }
 
