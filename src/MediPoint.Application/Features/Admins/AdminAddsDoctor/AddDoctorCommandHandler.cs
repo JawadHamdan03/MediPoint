@@ -26,6 +26,7 @@ public class AddDoctorCommandHandler(IAppDbContext dbContext) : IRequestHandler<
 
 
         await dbContext.Doctors.AddAsync(doc);
+        await dbContext.SaveChangesAsync(cancellationToken);
         return doc.Adapt<DoctorDto>();
     }
 }
