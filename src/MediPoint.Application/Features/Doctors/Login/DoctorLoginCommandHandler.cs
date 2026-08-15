@@ -33,6 +33,6 @@ public class DoctorLoginCommandHandler(IAppDbContext dbContext,IJwtTokenServiceP
             return jwtRes;
         }
         logger.LogWarning("Wrong Password for Doctor with Id {DoctorId}.", doc.Id);
-        throw new WrongPasswordException(doc.PasswordHash);
+        throw new WrongPasswordException(request.Request.Password);
     }
 }

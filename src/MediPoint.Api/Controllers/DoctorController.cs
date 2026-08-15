@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using MediPoint.Application.Features.Doctors.AddAppointment;
+using MediPoint.Application.Features.Doctors.DoctorRefreshToken;
 
 namespace MediPoint.Api.Controllers;
 
@@ -24,6 +25,14 @@ public class DoctorController(IMediator mediator) : ControllerBase
         var res = await mediator.Send(new DoctorLoginCommand(loginRequest));
         return Ok(res);
 
+    }
+
+
+    [HttpPost("refreshToken")]
+    public async Task<IActionResult> reffreshToken([FromBody] string refreshToken)
+    {
+        var res = await mediator.Send(new DoctorRefreshTokenCommand(refreshToken));
+        return Ok(res);
     }
 
     [Authorize(Roles = "Doctor")]
