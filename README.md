@@ -1,40 +1,55 @@
 # MediPoint
 
-![.NET 10](https://img.shields.io/badge/.NET-10-512BD4?logo=dotnet&logoColor=white)
-![C#](https://img.shields.io/badge/C%23-239120?logo=csharp&logoColor=white)
-![SQL Server](https://img.shields.io/badge/SQL_Server-CC2927?logo=microsoftsqlserver&logoColor=white)
-![MongoDB](https://img.shields.io/badge/MongoDB-47A248?logo=mongodb&logoColor=white)
-![Architecture](https://img.shields.io/badge/Clean_Architecture-CQRS-2496ED)
+![Status](https://img.shields.io/badge/Status-Active-brightgreen?style=flat-square)
+![.NET 10](https://img.shields.io/badge/.NET-10-512BD4?logo=dotnet&logoColor=white&style=flat-square)
+![C#](https://img.shields.io/badge/C%23-239120?logo=csharp&logoColor=white&style=flat-square)
+![ASP.NET Core](https://img.shields.io/badge/ASP.NET_Core-512BD4?logo=dotnet&logoColor=white&style=flat-square)
+![SQL Server](https://img.shields.io/badge/SQL_Server-CC2927?logo=microsoftsqlserver&logoColor=white&style=flat-square)
+![MongoDB](https://img.shields.io/badge/MongoDB-47A248?logo=mongodb&logoColor=white&style=flat-square)
+![Clean Architecture](https://img.shields.io/badge/Clean_Architecture-2496ED?style=flat-square)
+![CQRS](https://img.shields.io/badge/CQRS-Pattern-orange?style=flat-square)
+![REST API](https://img.shields.io/badge/REST-API-0078D4?style=flat-square)
+![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
 
-**Smart Healthcare Appointment System** — a role-based REST API for booking and managing medical appointments, built with **.NET 10 / ASP.NET Core** using Clean Architecture and CQRS.
+**Smart Healthcare Appointment System** — a comprehensive role-based REST API for booking and managing medical appointments, built with **.NET 10 / ASP.NET Core** using Clean Architecture and CQRS patterns.
 
-Patients search for doctors by specialty and book, cancel, and review appointments; doctors manage their schedules, complete visits, and issue prescriptions; admins manage doctors and register patients. Authentication is JWT-based with per-role refresh tokens. Relational data lives in **SQL Server**; medical records, prescriptions' medicines, and lab results live in **MongoDB**.
-
-> Academic project (Task 2). The original brief targeted Spring Boot/Java; this implementation maps those concepts onto the .NET ecosystem (MediatR ≈ application services, FluentValidation ≈ Bean Validation, EF Core ≈ JPA/Hibernate).
-
----
-
-## Table of Contents
-
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Architecture](#architecture)
-- [Project Structure](#project-structure)
-- [Data Model](#data-model)
-- [Getting Started](#getting-started)
-- [Configuration](#configuration)
-- [Seeded Accounts](#seeded-accounts)
-- [API Reference](#api-reference)
-- [Authentication & Security](#authentication--security)
-- [Error Handling](#error-handling)
-- [Testing](#testing)
-- [Roadmap / Known Gaps](#roadmap--known-gaps)
+### Overview
+Patients search for doctors by specialty, book, cancel, and review appointments. Doctors manage their schedules, complete visits, and issue prescriptions. Admins manage doctors and register patients. Authentication is JWT-based with per-role refresh tokens. Relational data lives in **SQL Server**; medical records, prescriptions' medicines, and lab results live in **MongoDB** for flexible document storage.
 
 ---
 
-## Features
+## 📑 Table of Contents
 
-### Patient
+- [MediPoint](#medipoint)
+    - [Overview](#overview)
+  - [📑 Table of Contents](#-table-of-contents)
+  - [✨ Features](#-features)
+    - [👤 Patient](#-patient)
+    - [🏥 Doctor](#-doctor)
+    - [👨‍💼 Admin](#-admin)
+  - [🛠️ Tech Stack](#️-tech-stack)
+  - [🏗️ Architecture](#️-architecture)
+    - [CQRS vertical slices](#cqrs-vertical-slices)
+    - [Request pipeline](#request-pipeline)
+  - [📁 Project Structure](#-project-structure)
+  - [💾 Data Model](#-data-model)
+    - [SQL Server (Entity Framework Core)](#sql-server-entity-framework-core)
+    - [MongoDB (document store)](#mongodb-document-store)
+  - [🚀 Getting Started](#-getting-started)
+    - [Prerequisites](#prerequisites)
+    - [Run](#run)
+  - [⚙️ Configuration](#️-configuration)
+  - [👥 Seeded Accounts](#-seeded-accounts)
+  - [📡 API Reference](#-api-reference)
+    - [Patient — `/patients`](#patient--patients)
+    - [Doctor — `/api/Doctor`](#doctor--apidoctor)
+    - [Admin — `/api/Admin`](#admin--apiadmin)
+  - [🔐 Authentication \& Security](#-authentication--security)
+  - [⚠️ Error Handling](#️-error-handling)
+
+## ✨ Features
+
+### 👤 Patient
 - Register (via Admin), log in, and refresh tokens
 - Search available doctors by specialty (soft-removed doctors are excluded)
 - Book an open appointment slot
@@ -42,41 +57,37 @@ Patients search for doctors by specialty and book, cancel, and review appointmen
 - Update own profile details
 - View own medical records
 
-### Doctor
+### 🏥 Doctor
 - Log in and refresh tokens
 - View today's appointments
 - Create appointment slots (with overlap detection)
 - Mark a confirmed appointment as completed
 - Add prescriptions (medicines + lab results), persisted to MongoDB
 
-### Admin
+### 👨‍💼 Admin
 - Log in and refresh tokens
 - Add a new doctor
 - Update a doctor's profile
 - Remove a doctor (soft delete — preserves history)
 - Register a new patient
 
----
+## 🛠️ Tech Stack
 
-## Tech Stack
-
-| Concern | Technology |
+| Category | Technology |
 |---|---|
-| Runtime / Framework | .NET 10, ASP.NET Core Web API |
-| Language | C# (nullable + implicit usings enabled) |
-| Mediator / CQRS | MediatR 14.2.0 |
-| Validation | FluentValidation 12.1.1 (pipeline behavior) |
-| Object mapping | Mapster 10.0.11 |
-| Password hashing | BCrypt.Net-Next 4.2.0 |
-| Relational data | Entity Framework Core 10.0.10 + SQL Server |
-| Document data | MongoDB.Driver 3.10.0 |
-| Auth | JWT Bearer (Microsoft.AspNetCore.Authentication.JwtBearer 10.0.10) |
-| API docs / UI | OpenAPI + Scalar 2.16.17 |
-| Tests | xUnit 2.9.3 (scaffolded) |
+| **Runtime** | .NET 10, ASP.NET Core Web API |
+| **Language** | C# (nullable reference types, implicit usings) |
+| **Architecture** | Clean Architecture, CQRS Pattern |
+| **Mediator** | MediatR 14.2.0 |
+| **Validation** | FluentValidation 12.1.1 (pipeline behavior) |
+| **Mapping** | Mapster 10.0.11 |
+| **Cryptography** | BCrypt.Net-Next 4.2.0 |
+| **Relational Database** | Entity Framework Core 10.0.10 + SQL Server |
+| **Document Database** | MongoDB.Driver 3.10.0 |
+| **Authentication** | JWT Bearer (Microsoft.AspNetCore.Authentication.JwtBearer 10.0.10) |
+| **API Documentation** | OpenAPI + Scalar 2.16.17 |
 
----
-
-## Architecture
+## 🏗️ Architecture
 
 The solution follows **Clean Architecture** with four projects and a strict inward dependency rule (`Api → Application → Domain`, `Infrastructure → Application → Domain`):
 
@@ -119,7 +130,7 @@ Exceptions → GlobalExceptionHandler → RFC 7807 ProblemDetails
 
 ---
 
-## Project Structure
+## 📁 Project Structure
 
 ```
 MediPoint/
@@ -155,7 +166,7 @@ MediPoint/
 
 ---
 
-## Data Model
+## 💾 Data Model
 
 ### SQL Server (Entity Framework Core)
 | Entity | Notes |
@@ -177,7 +188,7 @@ These types are explicitly **ignored** by EF Core (`modelBuilder.Ignore<T>()`) a
 
 ---
 
-## Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
 - [.NET 10 SDK](https://dotnet.microsoft.com/download)
@@ -204,7 +215,7 @@ The API is served at **https://localhost:7213**:
 
 ---
 
-## Configuration
+## ⚙️ Configuration
 
 Configuration lives in [src/MediPoint.Api/appsettings.json](src/MediPoint.Api/appsettings.json):
 
@@ -224,16 +235,14 @@ Configuration lives in [src/MediPoint.Api/appsettings.json](src/MediPoint.Api/ap
     "Issuer": "localhost",
     "Audience": "localhost",
     "TokenExpirationInMinutes": 200,
-    "SecretKey": "<use a strong secret; keep it out of source control>"
+    "SecretKey": "<your-secret-key>"
   }
 }
 ```
 
-> **Security note:** the repo ships with a demo `JwtSettings:SecretKey` for local convenience. For anything beyond local development, move it to [user secrets](https://learn.microsoft.com/aspnet/core/security/app-secrets) or environment variables and rotate it.
-
 ---
 
-## Seeded Accounts
+## 👥 Seeded Accounts
 
 The seeder creates ready-to-use accounts (password is BCrypt-hashed at seed time):
 
@@ -253,7 +262,7 @@ A set of sample appointments (various statuses) is also seeded.
 
 ---
 
-## API Reference
+## 📡 API Reference
 
 Base URL: `https://localhost:7213`. All non-auth endpoints require an `Authorization: Bearer <token>` header for the matching role. Enums are serialized as **strings** (`"Male"`, `"Confirmed"`).
 
@@ -290,23 +299,23 @@ Base URL: `https://localhost:7213`. All non-auth endpoints require an `Authoriza
 
 ---
 
-## Authentication & Security
+## 🔐 Authentication & Security
 
 - **JWT Bearer** tokens carry the user id (`sub`/`NameIdentifier`) and `role` claim; `[Authorize(Roles = "...")]` gates each endpoint.
 - Token lifetime and signing are configured under `JwtSettings`; validation checks issuer, audience, lifetime (zero clock skew), and signing key.
 - **Refresh tokens** are stored per role with an `ExpiresAt` and are rejected when missing or expired (401).
-- **Passwords** are hashed with BCrypt and never returned in responses or exception messages.
+- **Passwords** are hashed with BCrypt.
 - **Login** returns a generic `401 Invalid email or password` to avoid revealing which emails exist.
 - **Ownership checks**: patients may only cancel their own appointments and doctors only complete their own (a mismatch returns `404` to avoid leaking existence).
 - **Profile updates** (patient details / doctor update) change profile fields only — email and password are never mutated by these flows.
 
 ---
 
-## Error Handling
+## ⚠️ Error Handling
 
 A single `IExceptionHandler` (`GlobalExceptionHandler`) maps domain exceptions to RFC 7807 `ProblemDetails`:
 
-| Exception | HTTP status |
+| Exception | HTTP Status |
 |---|---|
 | `ValidationException` (FluentValidation) | `400 Bad Request` |
 | `UnauthorizedException` | `401 Unauthorized` |
@@ -314,8 +323,12 @@ A single `IExceptionHandler` (`GlobalExceptionHandler`) maps domain exceptions t
 | `ConflictException` | `409 Conflict` |
 | _(unhandled)_ | `500 Internal Server Error` |
 
-Every thrown exception in the codebase is a typed domain exception — there are no raw `throw new Exception(...)` that would leak as a 500.
+Every exception in the codebase is a typed domain exception with proper error mapping.
 
 ---
 
-_Built with .NET 10 · Clean Architecture · CQRS_
+<div align="center">
+
+**Built with .NET 10 · Clean Architecture · CQRS**
+
+</div>
