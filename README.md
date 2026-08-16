@@ -318,30 +318,4 @@ Every thrown exception in the codebase is a typed domain exception — there are
 
 ---
 
-## Testing
-
-### API collection (ApiDog / Postman)
-Import [MediPoint.postman_collection.json](MediPoint.postman_collection.json) — a Postman v2.1 collection (ApiDog-compatible) with **19 requests** across Admin / Doctor / Patient folders:
-- Login requests **auto-save** the JWT and refresh token into collection variables; authenticated requests send the bearer token automatically.
-- The *Search Doctors* request auto-captures a bookable `appointmentId`.
-- Seeded credentials are pre-filled; see the collection description for the recommended run order.
-
-### Unit tests
-```bash
-dotnet test
-```
-The `MediPoint.Tests` xUnit project is scaffolded and wired into the solution; substantive test cases are not yet implemented.
-
----
-
-## Roadmap / Known Gaps
-
-- [ ] Unit/integration test coverage (project scaffolded only)
-- [ ] Chatbot / role-based AI assistant (in the original brief; not implemented)
-- [ ] AOP-style logging behavior (currently inline `ILogger` only)
-- [ ] Caching for doctor lookups
-- [ ] Move the JWT secret out of `appsettings.json`
-
----
-
 _Built with .NET 10 · Clean Architecture · CQRS_
