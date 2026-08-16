@@ -1,4 +1,5 @@
 ﻿using Azure.Core;
+using MediPoint.Application.Common.Exceptions;
 using MediPoint.Application.Common.ServiceResponse;
 using MediPoint.Application.Common.Services;
 using MediPoint.Domain.Entities.RefreshToken;
@@ -106,7 +107,7 @@ public class JwtTokenServiceProvider(AppDbContext dbContext,IConfiguration confi
 
         if (user is null)
         {
-            throw new Exception("User Was Not Found");
+            throw new NotFoundException("User", request.Email);
         }
 
         var rawToken = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));

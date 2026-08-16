@@ -28,13 +28,12 @@ public class BookAppointmentCommandHandler(IAppDbContext dbContext,ILogger<BookA
         if (appointment.Status == AppointmentStatus.Confirmed)
         {
             logger.LogWarning("Double booking attempt prevented for Dr. {DoctorName} at 10:00 AM",appointment.Doctor.FirstName+" "+appointment.Doctor.LastName);
-            throw new Exception("Can't book this Appointment choose another one");    
+            throw new ConflictException("This appointment slot is already booked. Please choose another one.");
         }
 
         if ( appointment.Status == AppointmentStatus.Completed || appointment.Status == AppointmentStatus.Cancelled)
         {
-            throw new Exception("Can't book this Appointment choose another one");    
-
+            throw new ConflictException("This appointment is no longer available for booking. Please choose another one.");
         }
             
         var patient = request.Request.PatientId;

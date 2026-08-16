@@ -3,6 +3,11 @@ using MediPoint.Application.Features.Admins.AdminAddsDoctor;
 using MediPoint.Application.Features.Admins.AdminAddsDoctor.DTOs;
 using MediPoint.Application.Features.Admins.AdminRefreshToken;
 using MediPoint.Application.Features.Admins.Login;
+using MediPoint.Application.Features.Admins.UpdateDoctor;
+using MediPoint.Application.Features.Admins.UpdateDoctor.DTOs;
+using MediPoint.Application.Features.Admins.RemoveDoctor;
+using MediPoint.Application.Features.Admins.RegisterPatient;
+using MediPoint.Application.Features.Admins.RegisterPatient.DTOs;
 using MediPoint.Application.Features.Patients.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -33,6 +38,30 @@ public class AdminController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> addDoctor(DoctorDto doctor)
     {
         var res = await mediator.Send(new AddDoctorCommand(doctor));
+        return Ok(res);
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpPost("update-doctor/{doctorId}")]
+    public async Task<IActionResult> updateDoctor(Guid doctorId, UpdateDoctorDto doctor)
+    {
+        var res = await mediator.Send(new UpdateDoctorCommand(doctorId, doctor));
+        return Ok(res);
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpPost("remove-doctor/{doctorId}")]
+    public async Task<IActionResult> removeDoctor(Guid doctorId)
+    {
+        var res = await mediator.Send(new RemoveDoctorCommand(doctorId));
+        return Ok(res);
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpPost("register-patient")]
+    public async Task<IActionResult> registerPatient(PatientDto patient)
+    {
+        var res = await mediator.Send(new RegisterPatientCommand(patient));
         return Ok(res);
     }
     

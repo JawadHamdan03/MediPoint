@@ -16,7 +16,7 @@ public class FindDoctorsQueryHandler(IAppDbContext dbContext,ILogger<FindDoctors
 {
     public async Task<List<DoctorResponse>> Handle(FindDoctorsQuery request, CancellationToken cancellationToken)
     {
-        var doctors = await dbContext.Doctors.AsNoTracking().Include(d=>d.Appointments).Where(d=>d.Specialty.Equals(request.speciality)).ToListAsync();
+        var doctors = await dbContext.Doctors.AsNoTracking().Include(d=>d.Appointments).Where(d=>d.Specialty.Equals(request.speciality) && d.IsAvailable).ToListAsync();
         if (doctors is null)
         {
             logger.LogInformation("No doctors were found");

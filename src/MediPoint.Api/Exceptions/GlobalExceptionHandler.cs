@@ -33,6 +33,12 @@ public class GlobalExceptionHandler(IProblemDetailsService problemDetailsService
                 Detail = ex.Message,
                 Status = StatusCodes.Status401Unauthorized
             },
+            ConflictException ex => new ProblemDetails
+            {
+                Title = "Conflict",
+                Detail = ex.Message,
+                Status = StatusCodes.Status409Conflict
+            },
             _ => new ProblemDetails
             {
                 Title = "Server Error!",

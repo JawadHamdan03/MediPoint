@@ -8,6 +8,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using MediPoint.Application.Features.Patients.GetRecords;
+using MediPoint.Application.Features.Patients.CancelAppointment;
+using MediPoint.Application.Features.Patients.CancelAppointment.DTOs;
+using MediPoint.Application.Features.Patients.UpdateDetails;
+using MediPoint.Application.Features.Patients.UpdateDetails.DTOs;
 
 namespace MediPoint.Api.Controllers;
 
@@ -60,6 +64,24 @@ public class PatientController(IMediator mediator) : ControllerBase
     {
         var patientId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         var res = await mediator.Send(new GetRecordsCommand(Guid.Parse(patientId!)));
+        return Ok(res);
+    }
+
+    [Authorize(Roles = "Patient")]
+    [HttpPost("cancel-appointment/{appointmentId}")]
+    public async Task<IActionResult> CancelAppointment(Guid appointmentId, CancelAppointmentRequest request)
+    {
+        var patientId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var res = await mediator.Send(new CancelAppointmentCommand(appointmentId, Guid.Parse(patientId!), request.CancellationReason));
+        return Ok(res);
+    }
+
+    [Authorize(Roles = "Patient")]
+    [HttpPost("update-details")]
+    public async Task<IActionResult> UpdateDetails(UpdatePatientDto details)
+    {
+        var patientId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var res = await mediator.Send(new UpdatePatientDetailsCommand(Guid.Parse(patientId!), details));
         return Ok(res);
     }
     
