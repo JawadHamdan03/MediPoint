@@ -21,6 +21,9 @@ public class LabResultService(IOptions<MongoDbContext> mongoDbContext):ILabResul
 
     public async Task<LabResult?> GetAsync(string id) =>
         await _labResultsCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
+    
+    public async Task<LabResult?> GetByPatientIdAsync(Guid id) =>
+        await _labResultsCollection.Find(x => x.PatientId == id).FirstOrDefaultAsync();
 
     public async Task CreateAsync(LabResult medRecord) =>
         await _labResultsCollection.InsertOneAsync(medRecord);

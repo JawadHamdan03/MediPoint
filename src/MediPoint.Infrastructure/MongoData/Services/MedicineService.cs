@@ -21,6 +21,8 @@ public class MedicineService(IOptions<MongoDbContext> mongoDbContext):IMedicineS
 
     public async Task<Medicine?> GetAsync(string id) =>
         await _medicineCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
+    public async Task<Medicine?> GetByPatientIdAsync(Guid id) =>
+        await _medicineCollection.Find(x => x.PatientId == id).FirstOrDefaultAsync();
 
     public async Task CreateAsync(Medicine medRecord) =>
         await _medicineCollection.InsertOneAsync(medRecord);

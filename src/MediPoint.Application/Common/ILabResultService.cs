@@ -11,7 +11,9 @@ public interface ILabResultService
       
 
     Task<LabResult?> GetAsync(string id);
-     
+
+    public Task<LabResult?> GetByPatientIdAsync(Guid id);
+
 
     Task CreateAsync(LabResult medRecord);
        

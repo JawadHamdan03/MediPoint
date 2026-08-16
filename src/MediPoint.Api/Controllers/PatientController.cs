@@ -7,6 +7,7 @@ using MediPoint.Application.Features.Patients.RefreshPatientToken;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using MediPoint.Application.Features.Patients.GetRecords;
 
 namespace MediPoint.Api.Controllers;
 
@@ -53,5 +54,14 @@ public class PatientController(IMediator mediator) : ControllerBase
         return Ok(res);
     }
 
+    [Authorize(Roles = "Patient")]
+    [HttpGet("get-medical-records")]
+    public async Task<IActionResult> GetMedicalRecords()
+    {
+        var patientId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var res = await mediator.Send(new GetRecordsCommand(Guid.Parse(patientId!)));
+        return Ok(res);
+    }
+    
 
 }

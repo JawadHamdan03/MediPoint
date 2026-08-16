@@ -11,8 +11,9 @@ public interface IMedicineService
      
 
     Task<Medicine?> GetAsync(string id);
-        
 
+    public Task<Medicine?> GetByPatientIdAsync(Guid id);
+    
      Task CreateAsync(Medicine medRecord);
        
 
