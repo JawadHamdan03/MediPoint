@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
 
 namespace MediPoint.Application.Features.Patients.BookAppointment;
 
@@ -16,16 +17,29 @@ public class BookAppointmentCommandHandler(IAppDbContext dbContext,ILogger<BookA
 {
     public async Task<Appointment> Handle(BookAppointmentCommand request, CancellationToken cancellationToken)
     {
-        var appointment = await dbContext.Appointments.FindAsync(request.Request.AppointmentId);
+        var appointment = await dbContext.Appointments.Include(a=>a.Doctor)
+            .FirstOrDefaultAsync(a=>a.Id==request.Request.AppointmentId);
         if (appointment is null)
         {
             logger.LogError("No Appointment with {AppointmentId} were found", request.Request.AppointmentId);
             throw new NotFoundException("Appointment", request.Request.AppointmentId.ToString());
         }
-        if (appointment.Status == AppointmentStatus.Confirmed || appointment.Status == AppointmentStatus.Completed || appointment.Status == AppointmentStatus.Cancelled)
+
+        if (appointment.Status == AppointmentStatus.Confirmed)
+        {
+            logger.LogWarning("Double booking attempt prevented for Dr. {DoctorName} at 10:00 AM",appointment.Doctor.FirstName+" "+appointment.Doctor.LastName);
             throw new Exception("Can't book this Appointment choose another one");    
+        }
+
+        if ( appointment.Status == AppointmentStatus.Completed || appointment.Status == AppointmentStatus.Cancelled)
+        {
+            throw new Exception("Can't book this Appointment choose another one");    
+
+        }
+            
         var patient = request.Request.PatientId;
         appointment.PatientId = patient;
+        appointment.Status = AppointmentStatus.Confirmed;
         await dbContext.SaveChangesAsync(cancellationToken);
         logger.LogInformation("Patient with id {PatientId} successfully booked Appointment {request.Request.AppointmentId}", request.Request.PatientId, request.Request.AppointmentId);
         return appointment;

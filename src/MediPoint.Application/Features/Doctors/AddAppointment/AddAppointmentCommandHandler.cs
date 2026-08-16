@@ -7,6 +7,7 @@ using Mapster;
 using MediPoint.Application.Common;
 using MediPoint.Application.Common.Exceptions;
 using MediPoint.Domain.Entities.Apointments;
+using MediPoint.Domain.Entities.Appointments.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace MediPoint.Application.Features.Doctors.AddAppointment;
@@ -15,19 +16,23 @@ public class AddAppointmentCommandHandler(IAppDbContext dbContext) : IRequestHan
 {
     public async Task<ApponitmentDTO> Handle(AddAppointmentCommand request, CancellationToken cancellationToken)
     {
-        var app = request.appointment.Adapt<Appointment>();
+        var req = request.appointment;
+        var newStart = req.AppointmentDate;
+        var newEnd = newStart.AddMinutes(req.Duration);
 
-        var doctorApp = await dbContext.Appointments.Include(a => a.Doctor)
-            .Where(a => a.DoctorId.Equals(request.appointment.DoctorId)).ToListAsync();
+        
+        var hasConflict = await dbContext.Appointments
+            .Where(a => a.DoctorId == req.DoctorId && a.Status != AppointmentStatus.Cancelled)
+            .AnyAsync(a =>
+                newStart < a.AppointmentDate.AddMinutes(a.Duration) &&
+                a.AppointmentDate < newEnd,
+                cancellationToken);
 
-        var lim = request.appointment.AppointmentDate.AddMinutes(request.appointment.Duration);
-        foreach (var a in doctorApp)
-        {
-            if (a.AppointmentDate < lim)
-                throw new ConflictException("Conflict in Appointment Dates");
-        }
+        if (hasConflict)
+            throw new ConflictException("Conflict in Appointment Dates");
 
-        await dbContext.Appointments.AddAsync(app);
+        var app = req.Adapt<Appointment>();
+        await dbContext.Appointments.AddAsync(app, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
         return app.Adapt<ApponitmentDTO>();
     }
