@@ -16,8 +16,11 @@ public class AdminRefreshTokenCommandHandler(IAppDbContext dbContext,IJwtTokenSe
 
         if (rf is null)
         {
-            throw new Exception("No refresh token for this user, login first");
+            throw new UnauthorizedException("Invalid refresh token, login again");
         }
+
+        if (rf.ExpiresAt <= DateTime.UtcNow)
+            throw new UnauthorizedException("Refresh token expired, login again");
 
         var tokenResponse = await jwtTokenServiceProvider.GenerateJwtToken(rf.Admin);
         return tokenResponse;

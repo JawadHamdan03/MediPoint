@@ -11,16 +11,16 @@ public class AdminLoginCommandHandler(IAppDbContext dbContext,IJwtTokenServicePr
 {
     public async Task<JwtTokenResponse> Handle(AdminLoginCommand request, CancellationToken cancellationToken)
     {
-        var admin=await dbContext.Admins.FirstOrDefaultAsync(a=>a.Email.Equals(request.loginRequest.Email));
+        var admin = await dbContext.Admins.AsNoTracking().FirstOrDefaultAsync(a=>a.Email.Equals(request.loginRequest.Email));
 
         if (admin is null)
         {
-            throw new NotFoundException("Admin", request.loginRequest.Email);
+            throw new UnauthorizedException("Invalid email or password");
         }
 
         if (!BCrypt.Net.BCrypt.Verify(request.loginRequest.Password, admin.PasswordHash))
         {
-            throw new WrongPasswordException(request.loginRequest.Password);
+            throw new UnauthorizedException("Invalid email or password");
         }
         var tokenResponse =await  jwtTokenServiceProvider.GenerateJwtToken(admin);
         return tokenResponse;

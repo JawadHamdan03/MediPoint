@@ -18,21 +18,21 @@ public class DoctorLoginCommandHandler(IAppDbContext dbContext,IJwtTokenServiceP
 {
     public async Task<JwtTokenResponse> Handle(DoctorLoginCommand request, CancellationToken cancellationToken)
     {
-        var doc =await dbContext.Doctors.FirstOrDefaultAsync(d => d.Email.Equals(request.Request.Email));
-        if(doc is null)
+        var doc = await dbContext.Doctors.AsNoTracking().FirstOrDefaultAsync(d => d.Email.Equals(request.Request.Email));
+        if (doc is null)
         {
-            logger.LogError("Doctor with email {Email} was not found",request.Request.Email);
-            throw new NotFoundException("Doctor",request.Request.Email);
+            logger.LogWarning("Login failed: no doctor with email {Email}", request.Request.Email);
+            throw new UnauthorizedException("Invalid email or password");
         }
 
-        if(BCrypt.Net.BCrypt.Verify(request.Request.Password,doc.PasswordHash))
+        if (!BCrypt.Net.BCrypt.Verify(request.Request.Password, doc.PasswordHash))
         {
-
-            var jwtRes = await jwtTokenServiceProvider.GenerateJwtToken(doc);
-            logger.LogInformation("Doctor with Id {DoctorId} logged in",doc.Id);
-            return jwtRes;
+            logger.LogWarning("Login failed: wrong password for doctor with Id {DoctorId}", doc.Id);
+            throw new UnauthorizedException("Invalid email or password");
         }
-        logger.LogWarning("Wrong Password for Doctor with Id {DoctorId}.", doc.Id);
-        throw new WrongPasswordException(request.Request.Password);
+
+        var jwtRes = await jwtTokenServiceProvider.GenerateJwtToken(doc);
+        logger.LogInformation("Doctor with Id {DoctorId} logged in", doc.Id);
+        return jwtRes;
     }
 }

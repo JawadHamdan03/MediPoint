@@ -27,6 +27,12 @@ public class GlobalExceptionHandler(IProblemDetailsService problemDetailsService
                 Detail = ex.Message,
                 Status = StatusCodes.Status404NotFound
             },
+            UnauthorizedException ex => new ProblemDetails
+            {
+                Title = "Unauthorized",
+                Detail = ex.Message,
+                Status = StatusCodes.Status401Unauthorized
+            },
             _ => new ProblemDetails
             {
                 Title = "Server Error!",

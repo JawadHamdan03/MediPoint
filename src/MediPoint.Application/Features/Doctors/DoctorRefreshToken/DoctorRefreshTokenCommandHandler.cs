@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using MediPoint.Application.Common;
+using MediPoint.Application.Common.Exceptions;
 using MediPoint.Application.Common.ServiceResponse;
 using MediPoint.Application.Common.Services;
 using Microsoft.EntityFrameworkCore;
@@ -16,9 +17,12 @@ public class DoctorRefreshTokenCommandHandler(IAppDbContext dbContext,IJwtTokenS
             .FirstOrDefaultAsync(r => r.Token == request.refreshToken);
        if (rf is null)
        {
-           throw new Exception("No refresh token for this user, login first");
+           throw new UnauthorizedException("Invalid refresh token, login again");
        }
-       
+
+       if (rf.ExpiresAt <= DateTime.UtcNow)
+           throw new UnauthorizedException("Refresh token expired, login again");
+
        var tokenResponse = await jwtTokenServiceProvider.GenerateJwtToken(rf.Doctor);
        return tokenResponse;
        

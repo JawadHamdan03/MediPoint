@@ -23,15 +23,14 @@ public class PatientLoginCommandHandler(IAppDbContext dbContext,IJwtTokenService
 
         if (user is null)
         {
-            logger.LogError("User with Email {Email} Not Found",request.LoginRequest.Email);
-            throw new NotFoundException("Patient",request.LoginRequest.Email);
+            logger.LogWarning("Login failed: no patient with Email {Email}", request.LoginRequest.Email);
+            throw new UnauthorizedException("Invalid email or password");
         }
-        bool loginRes =  BCrypt.Net.BCrypt.Verify(request.LoginRequest.Password, user.PasswordHash);
-        
-        if (!loginRes)
+
+        if (!BCrypt.Net.BCrypt.Verify(request.LoginRequest.Password, user.PasswordHash))
         {
-            logger.LogWarning("User Login with Email {Email} entered wrong password", request.LoginRequest.Email);
-            throw new WrongPasswordException(user.PasswordHash);
+            logger.LogWarning("Login failed: wrong password for patient with Email {Email}", request.LoginRequest.Email);
+            throw new UnauthorizedException("Invalid email or password");
         }
 
         logger.LogInformation("User with Email {Email} just Logged in",request.LoginRequest.Email);
