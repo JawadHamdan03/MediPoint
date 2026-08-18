@@ -12,6 +12,8 @@ using MediPoint.Application.Features.Patients.CancelAppointment;
 using MediPoint.Application.Features.Patients.CancelAppointment.DTOs;
 using MediPoint.Application.Features.Patients.UpdateDetails;
 using MediPoint.Application.Features.Patients.UpdateDetails.DTOs;
+using MediPoint.Application.Features.Patients.Chat;
+using MediPoint.Application.Features.Patients.Chat.DTOs;
 
 namespace MediPoint.Api.Controllers;
 
@@ -84,6 +86,15 @@ public class PatientController(IMediator mediator) : ControllerBase
         var res = await mediator.Send(new UpdatePatientDetailsCommand(Guid.Parse(patientId!), details));
         return Ok(res);
     }
-    
+
+    [Authorize(Roles = "Patient")]
+    [HttpPost("chat")]
+    public async Task<IActionResult> Chat(ChatRequest request)
+    {
+        var patientId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var res = await mediator.Send(new ChatCommand(request.Message, Guid.Parse(patientId!)));
+        return Ok(res);
+    }
+
 
 }

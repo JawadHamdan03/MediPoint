@@ -12,6 +12,7 @@ using MediPoint.Infrastructure.Common.Utils;
 using MediPoint.Infrastructure.Data;
 using MediPoint.Infrastructure.MongoData;
 using MediPoint.Infrastructure.MongoData.Services;
+using MediPoint.Infrastructure.Ai;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Features;
@@ -27,12 +28,15 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
 builder.Services.AddScoped<IAppDbContext,AppDbContext>();
 builder.Services.Configure<MongoDbContext>(
     builder.Configuration.GetSection("MediPoint"));
 builder.Services.AddSingleton<IMedicalRecordsService,MedicalRecordService>();
 builder.Services.AddSingleton<IMedicineService,MedicineService>();
 builder.Services.AddSingleton<ILabResultService,LabResultService>();
+
+builder.Services.AddOpenAiChatClient(builder.Configuration);
 
 
 builder.Services.AddControllers().AddJsonOptions(options =>
