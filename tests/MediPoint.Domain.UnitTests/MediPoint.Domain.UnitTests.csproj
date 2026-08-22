@@ -14,7 +14,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\tests\MediPoint.Common\MediPoint.Common.csproj" />
+        <ProjectReference Include="..\MediPoint.Common\MediPoint.Common.csproj" />
     </ItemGroup>
 
 </Project>

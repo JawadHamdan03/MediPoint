@@ -9,10 +9,10 @@
     <Project Path="src/MediPoint.Infrastructure/MediPoint.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/tests/">
-    <Project Path="MediPoint.Domain.UnitTests/MediPoint.Domain.UnitTests.csproj" />
     <Project Path="tests/Api.IntegrationTests/Api.IntegrationTests.csproj" />
     <Project Path="tests/MediPoint.Appliaction.SubcutaneousTests/MediPoint.Appliaction.SubcutaneousTests.csproj" />
     <Project Path="tests/MediPoint.Application.UnitTests/MediPoint.Application.UnitTests.csproj" />
     <Project Path="tests/MediPoint.Common/MediPoint.Common.csproj" />
+    <Project Path="tests/MediPoint.Domain.UnitTests/MediPoint.Domain.UnitTests.csproj" />
   </Folder>
 </Solution>
