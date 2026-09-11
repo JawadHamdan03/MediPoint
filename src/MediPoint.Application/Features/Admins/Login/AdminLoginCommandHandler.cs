@@ -7,7 +7,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MediPoint.Application.Features.Admins.Login;
 
-public class AdminLoginCommandHandler(IAppDbContext dbContext,IJwtTokenServiceProvider jwtTokenServiceProvider) : IRequestHandler<AdminLoginCommand,JwtTokenResponse>
+public class AdminLoginCommandHandler(IAppDbContext dbContext,IMailer mailer,IJwtTokenServiceProvider jwtTokenServiceProvider)
+    : IRequestHandler<AdminLoginCommand,JwtTokenResponse>
 {
     public async Task<JwtTokenResponse> Handle(AdminLoginCommand request, CancellationToken cancellationToken)
     {
@@ -22,7 +23,10 @@ public class AdminLoginCommandHandler(IAppDbContext dbContext,IJwtTokenServicePr
         {
             throw new UnauthorizedException("Invalid email or password");
         }
+
+        await mailer.SendEmailAsync(admin.Email,"Login Success",$"Welcome Back admin ${admin.FirstName} {admin.LastName}.");
         var tokenResponse =await  jwtTokenServiceProvider.GenerateJwtToken(admin);
+        
         return tokenResponse;
 
     }

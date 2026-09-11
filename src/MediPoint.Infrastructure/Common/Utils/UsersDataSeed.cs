@@ -18,7 +18,7 @@ public static class UsersDataSeed
     {
         var dbContext = serviceProvider.GetService<AppDbContext>();
         if (dbContext == null) return;
-
+        
         // Seed Admins
         if (!await dbContext.Admins.AnyAsync())
         {
@@ -31,6 +31,17 @@ public static class UsersDataSeed
                     Email = "admin@medipoint.com",
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin@123"),
                     PhoneNumber = "+1234567890",
+                    DateOfBirth = new DateOnly(1985, 5, 15),
+                    Gender = Gender.Male,
+                   
+                },
+                new Admin
+                {
+                    FirstName = "Jawad",
+                    LastName = "Administrator",
+                    Email = "jawadhamdan003@gmail.com",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin@123"),
+                    PhoneNumber = "0592163158",
                     DateOfBirth = new DateOnly(1985, 5, 15),
                     Gender = Gender.Male,
                    
