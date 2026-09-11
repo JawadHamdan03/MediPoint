@@ -28,7 +28,7 @@ public class NotifyAdminsPeriodiclyJob(IServiceScopeFactory _scopeFactory,IMaile
             {
                await mailer.SendEmailAsync(admin.Email,"Notify",$"Please admin {admin.FirstName}, check on the system.");
             }
-            await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
+            await Task.Delay(TimeSpan.FromDays(7), stoppingToken);
          }
       }
       catch (OperationCanceledException)
