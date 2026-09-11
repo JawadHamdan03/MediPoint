@@ -14,6 +14,7 @@ using MediPoint.Infrastructure.Data;
 using MediPoint.Infrastructure.MongoData;
 using MediPoint.Infrastructure.MongoData.Services;
 using MediPoint.Infrastructure.Ai;
+using MediPoint.Infrastructure.Common.Jobs;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Features;
@@ -106,6 +107,8 @@ builder.Services.AddAuthentication(options =>
 });
 
 builder.Services.AddAuthorization();
+
+builder.Services.AddHostedService<NotifyAdminsPeriodiclyJob>();
 
 builder.Services.AddCors(options =>
 {
