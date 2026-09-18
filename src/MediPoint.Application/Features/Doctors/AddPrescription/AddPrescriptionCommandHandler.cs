@@ -10,9 +10,11 @@ using System.Collections.Generic;
 using System.Text;
 using MediPoint.Domain.Entities.Prescriptions.Med;
 using MediPoint.Domain.Entities.Prescriptions.LabRes;
+using Microsoft.Extensions.Caching.Memory;
+
 namespace MediPoint.Application.Features.Doctors.AddPrescription;
 
-public class AddPrescriptionCommandHandler(IAppDbContext dbContext,IMedicineService medicineService,ILabResultService labResultService) : IRequestHandler<AddPrescriptionCommand, PrescriptionResponse>
+public class AddPrescriptionCommandHandler(IAppDbContext dbContext,IMemoryCache memoryCache,IMedicineService medicineService,ILabResultService labResultService) : IRequestHandler<AddPrescriptionCommand, PrescriptionResponse>
 {
     public async Task<PrescriptionResponse> Handle(AddPrescriptionCommand request, CancellationToken cancellationToken)
     {
@@ -23,7 +25,7 @@ public class AddPrescriptionCommandHandler(IAppDbContext dbContext,IMedicineServ
         }
 
         var req = request.PrescriptionRequest;
-
+        
         Prescription prs = request.PrescriptionRequest.Adapt<Prescription>();
         prs.AppointmentId = app.Id;
         prs.PatientId = app.PatientId;
@@ -31,7 +33,8 @@ public class AddPrescriptionCommandHandler(IAppDbContext dbContext,IMedicineServ
 
         await dbContext.Prescriptions.AddAsync(prs);
         await dbContext.SaveChangesAsync(cancellationToken);
-
+        
+        memoryCache.Remove("records-key");
         if(!string.IsNullOrEmpty(req.MedicineName))
             await medicineService.CreateAsync(new Medicine { Dosage = req.Dosage,DurationDays=req.DurationDays,
                 Instructions=req.Instructions,

@@ -2,20 +2,34 @@
 using MediatR;
 using MediPoint.Application.Common;
 using MediPoint.Application.Features.Patients.GetRecords.DTOs;
+using MediPoint.Domain.Entities.MedicalRecords;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace MediPoint.Application.Features.Patients.GetRecords;
 
-public class GetRecordsCommandHandler(IAppDbContext dbContext,ILabResultService labResultService,IMedicineService medicineService) 
+public class GetRecordsCommandHandler(IAppDbContext dbContext,IMemoryCache memoryCache,ILabResultService labResultService,IMedicineService medicineService) 
     : IRequestHandler<GetRecordsCommand,List<MedicalRecordResponse>>
 {
     public async Task<List<MedicalRecordResponse>> Handle(GetRecordsCommand request, CancellationToken cancellationToken)
     {
         var patientId = request.PatientId;
 
+        string recordsCacheKey = "records-key";
+
+        List<MedicalRecordResponse>? medicalRecordResponses;
+        if (memoryCache.TryGetValue(recordsCacheKey,out medicalRecordResponses))
+        {
+            return medicalRecordResponses!;
+        }
+        
+        
         var prescriptions= await dbContext.Prescriptions.Include(p=>p.Doctor).Where(p=>p.PatientId == patientId).ToListAsync();
 
-        List<MedicalRecordResponse> medicalRecordResponses = new List<MedicalRecordResponse>();
+        
+        
+        
+        medicalRecordResponses = new List<MedicalRecordResponse>();
         foreach (var pres in prescriptions)
         {
             var labresults = (await labResultService.GetAsync()).Where(x => x.PrescriptionId == pres.Id);
@@ -28,7 +42,11 @@ public class GetRecordsCommandHandler(IAppDbContext dbContext,ILabResultService 
             
             medicalRecordResponses.Add(medRes);
         }
-        
+        memoryCache.Set(recordsCacheKey,medicalRecordResponses, new MemoryCacheEntryOptions()
+        {
+            Size = 1,
+            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10)
+        });
         return  medicalRecordResponses;
         
     }

@@ -5,10 +5,11 @@ using MediPoint.Application.Common.Exceptions;
 using MediPoint.Application.Features.Admins.AdminAddsDoctor.DTOs;
 using MediPoint.Domain.Entities.User;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace MediPoint.Application.Features.Admins.AdminAddsDoctor;
 
-public class AddDoctorCommandHandler(IAppDbContext dbContext) : IRequestHandler<AddDoctorCommand,DoctorDto>
+public class AddDoctorCommandHandler(IAppDbContext dbContext,IMemoryCache memoryCache) : IRequestHandler<AddDoctorCommand,DoctorDto>
 {
     public async Task<DoctorDto> Handle(AddDoctorCommand request, CancellationToken cancellationToken)
     { 
@@ -27,6 +28,7 @@ public class AddDoctorCommandHandler(IAppDbContext dbContext) : IRequestHandler<
 
         await dbContext.Doctors.AddAsync(doc);
         await dbContext.SaveChangesAsync(cancellationToken);
+       
         return doc.Adapt<DoctorDto>();
     }
 }

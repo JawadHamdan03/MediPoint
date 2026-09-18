@@ -1,28 +1,13 @@
-using System.Text;
 using System.Threading.RateLimiting;
-using FluentValidation;
-using MediatR;
-using MediPoint.Api.Exceptions;
 using MediPoint.Api.Registerations;
-using MediPoint.Application;
-using MediPoint.Application.Common;
-using MediPoint.Application.Common.Behaviors;
 using MediPoint.Application.Common.Services;
-
 using MediPoint.Infrastructure.Common.Services;
 using MediPoint.Infrastructure.Common.Utils;
 using MediPoint.Infrastructure.Data;
-using MediPoint.Infrastructure.MongoData;
-using MediPoint.Infrastructure.MongoData.Services;
 using MediPoint.Infrastructure.Ai;
 using MediPoint.Infrastructure.Common.Jobs;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.Features;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -52,6 +37,10 @@ builder.Services.AddScoped<IJwtTokenServiceProvider, JwtTokenServiceProvider>();
 builder.Services.AddOpenAiChatClient(builder.Configuration);
 builder.Services.AddOpenApi();
 
+builder.Services.AddMemoryCache(options =>
+{
+    options.SizeLimit = 100;
+});
 
 
 builder.Services.AddHostedService<NotifyAdminsPeriodiclyJob>();
