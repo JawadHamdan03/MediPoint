@@ -27,8 +27,7 @@ public class Appointment : BaseEntity
 
     public Guid DoctorId{ get; set; }
     public Doctor Doctor { get; set; }
-
-
+    
     public Prescription? Prescription { get; set; }
-
+    
 }
