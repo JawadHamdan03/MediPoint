@@ -1,7 +1,9 @@
 <Solution>
   <Folder Name="/Solution Items/">
     <File Path=".github/workflows/ci.yml" />
+    <File Path="docs/ai-assistant.md" />
     <File Path="medipoint-api.openapi.json" />
+    <File Path="PROGRESS.md" />
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/MediPoint.Api/MediPoint.Api.csproj" />

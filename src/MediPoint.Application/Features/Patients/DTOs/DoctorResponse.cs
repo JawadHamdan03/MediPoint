@@ -22,5 +22,7 @@ public class DoctorResponse
 
     public string Biography { get; set; } = "";
 
+    public string? ImageUrl { get; set; }
+
     public List<AppointmentDTO> AppointmentDTOs { get; set; }
 }

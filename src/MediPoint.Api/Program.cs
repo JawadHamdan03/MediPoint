@@ -36,6 +36,7 @@ builder.Services.AddScoped<IJwtTokenServiceProvider, JwtTokenServiceProvider>();
 
 builder.Services.AddOpenAiChatClient(builder.Configuration);
 builder.Services.AddOpenApi();
+builder.Services.AddStorageRegisteration();
 
 builder.Services.AddMemoryCache(options =>
 {
@@ -75,6 +76,7 @@ if (app.Environment.IsDevelopment())
 }
 app.UseExceptionHandler();
 app.UseHttpsRedirection();
+app.UseStaticFiles();
 app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
