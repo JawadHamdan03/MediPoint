@@ -9,6 +9,13 @@
 ![Clean Architecture](https://img.shields.io/badge/Clean_Architecture-2496ED?style=flat-square)
 ![CQRS](https://img.shields.io/badge/CQRS-Pattern-orange?style=flat-square)
 ![REST API](https://img.shields.io/badge/REST-API-0078D4?style=flat-square)
+![CI](https://img.shields.io/badge/CI-GitHub_Actions-2088FF?logo=githubactions&logoColor=white&style=flat-square)
+![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white&style=flat-square)
+![xUnit](https://img.shields.io/badge/Tests-xUnit-5C2D91?logo=nunit&logoColor=white&style=flat-square)
+![AI Assistant](https://img.shields.io/badge/AI-OpenAI_Agent-412991?logo=openai&logoColor=white&style=flat-square)
+![Background Jobs](https://img.shields.io/badge/Background-Hosted_Services-6E40C9?style=flat-square)
+![Email](https://img.shields.io/badge/Email-MailKit_SMTP-D14836?logo=maildotru&logoColor=white&style=flat-square)
+![Rate Limiting](https://img.shields.io/badge/Rate_Limiting-Enabled-yellow?style=flat-square)
 ![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
 
 **Smart Healthcare Appointment System** — a comprehensive role-based REST API for booking and managing medical appointments, built with **.NET 10 / ASP.NET Core** using Clean Architecture and CQRS patterns.
@@ -27,6 +34,7 @@ Patients search for doctors by specialty, book, cancel, and review appointments.
     - [👤 Patient](#-patient)
     - [🏥 Doctor](#-doctor)
     - [👨‍💼 Admin](#-admin)
+    - [📣 Notifications \& Background Jobs](#-notifications--background-jobs)
   - [🛠️ Tech Stack](#️-tech-stack)
   - [🏗️ Architecture](#️-architecture)
     - [CQRS vertical slices](#cqrs-vertical-slices)
@@ -42,10 +50,12 @@ Patients search for doctors by specialty, book, cancel, and review appointments.
   - [👥 Seeded Accounts](#-seeded-accounts)
   - [📡 API Reference](#-api-reference)
     - [Patient — `/patients`](#patient--patients)
+    - [Users (shared) — `/users`](#users-shared--users)
     - [Doctor — `/api/Doctor`](#doctor--apidoctor)
     - [Admin — `/api/Admin`](#admin--apiadmin)
   - [🔐 Authentication \& Security](#-authentication--security)
   - [⚠️ Error Handling](#️-error-handling)
+  - [🧪 Testing \& CI/CD](#-testing--cicd)
 
 ## ✨ Features
 
@@ -56,6 +66,8 @@ Patients search for doctors by specialty, book, cancel, and review appointments.
 - Cancel an own appointment (with optional reason)
 - Update own profile details
 - View own medical records
+- Upload a profile image
+- Chat with an AI assistant that can search doctors and pull the patient's own medical records
 
 ### 🏥 Doctor
 - Log in and refresh tokens
@@ -63,6 +75,7 @@ Patients search for doctors by specialty, book, cancel, and review appointments.
 - Create appointment slots (with overlap detection)
 - Mark a confirmed appointment as completed
 - Add prescriptions (medicines + lab results), persisted to MongoDB
+- Upload a profile image
 
 ### 👨‍💼 Admin
 - Log in and refresh tokens
@@ -70,6 +83,13 @@ Patients search for doctors by specialty, book, cancel, and review appointments.
 - Update a doctor's profile
 - Remove a doctor (soft delete — preserves history)
 - Register a new patient
+
+### 📣 Notifications & Background Jobs
+- Transactional emails (login, booking, cancellation, completion, doctor deactivation) via SMTP
+- Periodic admin reminder job
+- Appointment reminder job (23–24h before a confirmed appointment)
+- Expired refresh token cleanup job
+- Stale pending-appointment auto-cancellation job
 
 ## 🛠️ Tech Stack
 
@@ -86,6 +106,15 @@ Patients search for doctors by specialty, book, cancel, and review appointments.
 | **Document Database** | MongoDB.Driver 3.10.0 |
 | **Authentication** | JWT Bearer (Microsoft.AspNetCore.Authentication.JwtBearer 10.0.10) |
 | **API Documentation** | OpenAPI + Scalar 2.16.17 |
+| **AI Assistant** | Microsoft.Agents.AI 1.18.0 (`Microsoft.Extensions.AI` over OpenAI's `IChatClient`) |
+| **Email** | MailKit / MimeKit (SMTP) |
+| **Background Jobs** | ASP.NET Core `BackgroundService` hosted services |
+| **Caching** | `IMemoryCache` (in-memory) |
+| **File Storage** | Local file storage service (profile images) |
+| **Rate Limiting** | ASP.NET Core rate limiting middleware (concurrency limiter) |
+| **Testing** | xUnit, NSubstitute |
+| **CI/CD** | GitHub Actions (`restore` → `build` → `test`) |
+| **Containerization** | Docker |
 
 ## 🏗️ Architecture
 
@@ -137,31 +166,44 @@ MediPoint/
 ├── MediPoint.slnx                     # Solution (XML format)
 ├── MediPoint.postman_collection.json  # ApiDog / Postman collection
 ├── request.http                       # Ad-hoc HTTP requests
+├── docs/
+│   └── ai-assistant.md                # AI chat feature design writeup
+├── .github/workflows/ci.yml           # GitHub Actions: restore → build → test
 ├── src/
+│   ├── Dockerfile
 │   ├── MediPoint.Api/                 # Web API host
-│   │   ├── Controllers/               # Admin, Doctor, Patient
+│   │   ├── Controllers/               # Admin, Doctor, Patient, Users
 │   │   ├── Exceptions/                # GlobalExceptionHandler
-│   │   ├── Program.cs                 # DI, auth, pipeline, startup seeding
+│   │   ├── Registerations/            # DI extension methods (Email, Storage, Auth, DB...)
+│   │   ├── Program.cs                 # DI, auth, pipeline, hosted jobs, startup seeding
 │   │   └── appsettings.json
 │   ├── MediPoint.Application/
-│   │   ├── Common/                    # IAppDbContext, behaviors, exceptions, services
+│   │   ├── Common/                    # IAppDbContext, behaviors, exceptions, services (IMailer, IFileStorageService)
 │   │   └── Features/
 │   │       ├── Admins/                # Login, RefreshToken, AdminAddsDoctor,
 │   │       │                          #   UpdateDoctor, RemoveDoctor, RegisterPatient
 │   │       ├── Doctors/               # Login, RefreshToken, AddAppointment,
 │   │       │                          #   AppointmentsQuery, AddPrescription, CompleteAppointment
-│   │       └── Patients/              # Login, RefreshPatientToken, FindDoctors,
-│   │                                  #   BookAppointment, CancelAppointment,
-│   │                                  #   UpdateDetails, GetRecords
+│   │       ├── Patients/              # Login, RefreshPatientToken, FindDoctors,
+│   │       │                          #   BookAppointment, CancelAppointment,
+│   │       │                          #   UpdateDetails, GetRecords, Chat (AI assistant)
+│   │       └── Users/                 # UploadProfileImage (shared across roles)
 │   ├── MediPoint.Infrastructure/
 │   │   ├── Data/                      # AppDbContext + EF configurations + migrations
 │   │   ├── MongoData/                 # MongoDbContext + document services
-│   │   └── Common/                    # JwtTokenServiceProvider, UsersDataSeed
+│   │   ├── Ai/                        # OpenAI IChatClient registration
+│   │   └── Common/
+│   │       ├── Jobs/                  # BackgroundService hosted jobs (reminders, cleanup)
+│   │       └── Services/              # JwtTokenServiceProvider, Mailer, LocalFileStorageService
 │   └── MediPoint.Domain/
 │       └── Entities/                  # Users, Appointments, Prescriptions,
 │                                      #   MedicalRecords, RefreshToken + enums
 └── tests/
-    └── MediPoint.Tests/               # xUnit test project (scaffolded)
+    ├── MediPoint.Common/                      # shared test fixtures
+    ├── MediPoint.Domain.UnitTests/            # xUnit — domain entity behavior
+    ├── MediPoint.Application.UnitTests/       # xUnit + NSubstitute — pipeline behaviors
+    ├── MediPoint.Appliaction.SubcutaneousTests/ # handler-level tests
+    └── Api.IntegrationTests/                  # end-to-end API tests
 ```
 
 ---
@@ -276,6 +318,12 @@ Base URL: `https://localhost:7213`. All non-auth endpoints require an `Authoriza
 | POST | `/patients/cancel-appointment/{appointmentId}` | Patient | Cancel own appointment (`{ cancellationReason? }`) |
 | POST | `/patients/update-details` | Patient | Update own profile (no email/password change) |
 | GET | `/patients/get-medical-records` | Patient | Retrieve own medical records (Mongo) |
+| POST | `/patients/chat` | Patient | Chat with the AI assistant (can search doctors / fetch own records) |
+
+### Users (shared) — `/users`
+| Method | Route | Auth | Description |
+|---|---|---|---|
+| POST | `/users/profile-image` | Any authenticated role | Upload a profile image (`multipart/form-data`, field `image`) |
 
 ### Doctor — `/api/Doctor`
 | Method | Route | Auth | Description |
@@ -308,6 +356,19 @@ Base URL: `https://localhost:7213`. All non-auth endpoints require an `Authoriza
 - **Login** returns a generic `401 Invalid email or password` to avoid revealing which emails exist.
 - **Ownership checks**: patients may only cancel their own appointments and doctors only complete their own (a mismatch returns `404` to avoid leaking existence).
 - **Profile updates** (patient details / doctor update) change profile fields only — email and password are never mutated by these flows.
+
+---
+
+## 🧪 Testing & CI/CD
+
+```bash
+dotnet test                                                          # all test projects
+dotnet test tests/MediPoint.Domain.UnitTests                         # domain entity behavior
+dotnet test tests/MediPoint.Application.UnitTests                    # pipeline behaviors (NSubstitute)
+dotnet test --filter "FullyQualifiedName~ValidationBehaviorTest"     # one test class
+```
+
+GitHub Actions (`.github/workflows/ci.yml`) runs `dotnet restore && dotnet build --no-restore && dotnet test --no-build` on every push/PR to `main`. A `Dockerfile` (`src/Dockerfile`) is available for containerized builds.
 
 ---
 
