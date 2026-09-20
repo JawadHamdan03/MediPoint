@@ -83,7 +83,6 @@ public static class UsersDataSeed
                     YearsOfExperience = 15,
                     ConsultationFee = 150.00m,
                     Biography = "Experienced cardiologist specializing in heart disease prevention and treatment.",
-                    IsAvailable = true
                 },
                 new Doctor
                 {
@@ -100,7 +99,6 @@ public static class UsersDataSeed
                     YearsOfExperience = 10,
                     ConsultationFee = 120.00m,
                     Biography = "Pediatrician with extensive experience in child healthcare and development.",
-                    IsAvailable = true
                 },
                 new Doctor
                 {
@@ -117,7 +115,6 @@ public static class UsersDataSeed
                     YearsOfExperience = 18,
                     ConsultationFee = 180.00m,
                     Biography = "Orthopedic surgeon specializing in joint replacement and sports injuries.",
-                    IsAvailable = true
                 },
                 new Doctor
                 {
@@ -134,7 +131,6 @@ public static class UsersDataSeed
                     YearsOfExperience = 12,
                     ConsultationFee = 130.00m,
                     Biography = "Dermatologist specializing in skin conditions and cosmetic procedures.",
-                    IsAvailable = true
                 },
                 new Doctor
                 {
@@ -151,7 +147,6 @@ public static class UsersDataSeed
                     YearsOfExperience = 20,
                     ConsultationFee = 200.00m,
                     Biography = "Neurologist with expertise in treating neurological disorders and brain conditions.",
-                    IsAvailable = true
                 }
             };
 
@@ -269,88 +264,40 @@ public static class UsersDataSeed
 
             if (doctors.Count > 0 && patients.Count > 0)
             {
+                var confirmedCheckup = Appointment.Create(doctors[0].Id, DateTime.Now.AddHours(1), 30, "General Checkup");
+                confirmedCheckup.Confirm(patients[2].Id);
+
+                var confirmedPediatric = Appointment.Create(doctors[1].Id, DateTime.Now.AddDays(3).AddHours(14), 30, "Child Health Checkup");
+                confirmedPediatric.Confirm(patients[1].Id);
+
+                var openJointSlot = Appointment.Create(doctors[2].Id, DateTime.Now.AddDays(7).AddHours(11), 45, "Joint Pain Assessment");
+
+                var confirmedDermatology = Appointment.Create(doctors[3].Id, DateTime.Now.AddDays(10).AddHours(9), 30, "Skin Condition Evaluation");
+                confirmedDermatology.Confirm(patients[3].Id);
+
+                var confirmedNeurology = Appointment.Create(doctors[4].Id, DateTime.Now.AddDays(2).AddHours(15), 45, "Neurological Examination");
+                confirmedNeurology.Confirm(patients[4].Id);
+
+                var openCardiacSlot = Appointment.Create(doctors[0].Id, DateTime.Now.AddDays(6).AddHours(13), 30, "Cardiac Consultation");
+
+                var completedFollowUp = Appointment.Create(doctors[1].Id, DateTime.Now.AddDays(-5).AddHours(10), 30, "Follow-up Visit");
+                completedFollowUp.Confirm(patients[0].Id);
+                completedFollowUp.Complete("Completed routine examination.");
+
+                var cancelledSurgeryConsult = Appointment.Create(doctors[2].Id, DateTime.Now.AddDays(8).AddHours(16), 30, "Joint Surgery Consultation");
+                cancelledSurgeryConsult.Confirm(patients[1].Id);
+                cancelledSurgeryConsult.Cancel("Patient requested to reschedule.");
+
                 var appointments = new List<Appointment>
                 {
-                    new Appointment
-                    {
-                        PatientId = patients[2].Id,
-                        DoctorId = doctors[0].Id,
-                        AppointmentDate = DateTime.Now.AddHours(1),
-                        Duration = 30,
-                        Status = AppointmentStatus.Confirmed,
-                        Reason = "General Checkup",
-                        Notes = "Patient scheduled for routine heart examination."
-                    },
-                    new Appointment
-                    {
-                        PatientId = patients[1].Id,
-                        DoctorId = doctors[1].Id,
-                        AppointmentDate = DateTime.Now.AddDays(3).AddHours(14),
-                        Duration = 30,
-                        Status = AppointmentStatus.Confirmed,
-                        Reason = "Child Health Checkup",
-                        Notes = "Annual pediatric examination."
-                    },
-                    new Appointment
-                    {
-                        PatientId = patients[2].Id,
-                        DoctorId = doctors[2].Id,
-                        AppointmentDate = DateTime.Now.AddDays(7).AddHours(11),
-                        Duration = 45,
-                        Status = AppointmentStatus.Pending,
-                        Reason = "Joint Pain Assessment",
-                        Notes = "Patient reports knee pain after sports injury."
-                    },
-                    new Appointment
-                    {
-                        PatientId = patients[3].Id,
-                        DoctorId = doctors[3].Id,
-                        AppointmentDate = DateTime.Now.AddDays(10).AddHours(09),
-                        Duration = 30,
-                        Status = AppointmentStatus.Confirmed,
-                        Reason = "Skin Condition Evaluation",
-                        Notes = "Follow-up appointment for dermatological treatment."
-                    },
-                    new Appointment
-                    {
-                        PatientId = patients[4].Id,
-                        DoctorId = doctors[4].Id,
-                        AppointmentDate = DateTime.Now.AddDays(2).AddHours(15),
-                        Duration = 45,
-                        Status = AppointmentStatus.Confirmed,
-                        Reason = "Neurological Examination",
-                        Notes = "Patient experiencing occasional headaches."
-                    },
-                    new Appointment
-                    {
-                        PatientId = patients[5].Id,
-                        DoctorId = doctors[0].Id,
-                        AppointmentDate = DateTime.Now.AddDays(6).AddHours(13),
-                        Duration = 30,
-                        Status = AppointmentStatus.Pending,
-                        Reason = "Cardiac Consultation",
-                        Notes = "Initial consultation for heart health assessment."
-                    },
-                    new Appointment
-                    {
-                        PatientId = patients[0].Id,
-                        DoctorId = doctors[1].Id,
-                        AppointmentDate = DateTime.Now.AddDays(-5).AddHours(10),
-                        Duration = 30,
-                        Status = AppointmentStatus.Completed,
-                        Reason = "Follow-up Visit",
-                        Notes = "Completed routine examination."
-                    },
-                    new Appointment
-                    {
-                        PatientId = patients[1].Id,
-                        DoctorId = doctors[2].Id,
-                        AppointmentDate = DateTime.Now.AddDays(8).AddHours(16),
-                        Duration = 30,
-                        Status = AppointmentStatus.Cancelled,
-                        Reason = "Joint Surgery Consultation",
-                        CancellationReason = "Patient requested to reschedule."
-                    }
+                    confirmedCheckup,
+                    confirmedPediatric,
+                    openJointSlot,
+                    confirmedDermatology,
+                    confirmedNeurology,
+                    openCardiacSlot,
+                    completedFollowUp,
+                    cancelledSurgeryConsult
                 };
 
                 await dbContext.Appointments.AddRangeAsync(appointments);

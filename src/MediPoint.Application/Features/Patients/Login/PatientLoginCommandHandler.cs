@@ -13,7 +13,7 @@ using System.Text;
 
 namespace MediPoint.Application.Features.Patients.Login;
 
-public class PatientLoginCommandHandler(IAppDbContext dbContext,IJwtTokenServiceProvider jwtTokenServiceProvider,ILogger<PatientLoginCommandHandler>logger)
+public class PatientLoginCommandHandler(IAppDbContext dbContext,IJwtTokenServiceProvider jwtTokenServiceProvider,ILogger<PatientLoginCommandHandler>logger,IMailer mailer)
     : IRequestHandler<PatientLoginCommand, JwtTokenResponse>
 {
     public async Task<JwtTokenResponse> Handle(PatientLoginCommand request, CancellationToken cancellationToken)
@@ -33,6 +33,7 @@ public class PatientLoginCommandHandler(IAppDbContext dbContext,IJwtTokenService
             throw new UnauthorizedException("Invalid email or password");
         }
 
+        await mailer.SendEmailAsync(user.Email, "Login Success", $"Welcome back {user.FirstName} {user.LastName}.");
         logger.LogInformation("User with Email {Email} just Logged in",request.LoginRequest.Email);
         var tokenres = await jwtTokenServiceProvider.GenerateJwtToken(user);
         return tokenres; 

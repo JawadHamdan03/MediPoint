@@ -1,4 +1,5 @@
-﻿using MediPoint.Domain.Entities.Apointments;
+﻿using MediPoint.Domain.Common.Exceptions;
+using MediPoint.Domain.Entities.Apointments;
 using MediPoint.Domain.Entities.User.Shared;
 using MediPoint.Domain.Entities.Prescriptions;
 using System;
@@ -20,11 +21,19 @@ public class Doctor : BaseUser
 
     public string Biography { get; set; } = "";
 
-    public bool IsAvailable { get; set; } = true;
+    public bool IsAvailable { get; private set; } = true;
 
 
     public List<Appointment> Appointments { get; set; } = new List<Appointment>();
     public List<Prescription> Prescriptions { get; set; } = new List<Prescription>();
 
-    public List<DoctorRefreshToken> DoctorRefreshTokens { get; set; } 
+    public List<DoctorRefreshToken> DoctorRefreshTokens { get; set; }
+
+    public void Deactivate()
+    {
+        if (!IsAvailable)
+            throw new DomainException("Doctor is already removed.");
+
+        IsAvailable = false;
+    }
 }

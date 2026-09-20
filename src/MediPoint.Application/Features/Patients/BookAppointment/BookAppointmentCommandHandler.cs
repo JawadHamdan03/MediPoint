@@ -1,10 +1,9 @@
-﻿using DnsClient.Internal;
-using MediatR;
+﻿using MediatR;
 using MediPoint.Application.Common;
 using MediPoint.Application.Common.Exceptions;
-using MediPoint.Application.Features.Patients.DTOs;
+using MediPoint.Application.Common.Services;
+using MediPoint.Domain.Common.Exceptions;
 using MediPoint.Domain.Entities.Apointments;
-using MediPoint.Domain.Entities.Appointments.Enums;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -13,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MediPoint.Application.Features.Patients.BookAppointment;
 
-public class BookAppointmentCommandHandler(IAppDbContext dbContext,ILogger<BookAppointmentCommandHandler>logger) : IRequestHandler<BookAppointmentCommand, Appointment>
+public class BookAppointmentCommandHandler(IAppDbContext dbContext,ILogger<BookAppointmentCommandHandler>logger,IMailer mailer) : IRequestHandler<BookAppointmentCommand, Appointment>
 {
     public async Task<Appointment> Handle(BookAppointmentCommand request, CancellationToken cancellationToken)
     {
@@ -25,22 +24,27 @@ public class BookAppointmentCommandHandler(IAppDbContext dbContext,ILogger<BookA
             throw new NotFoundException("Appointment", request.Request.AppointmentId.ToString());
         }
 
-        if (appointment.Status == AppointmentStatus.Confirmed)
+        try
         {
-            logger.LogWarning("Double booking attempt prevented for Dr. {DoctorName} at 10:00 AM",appointment.Doctor.FirstName+" "+appointment.Doctor.LastName);
-            throw new ConflictException("This appointment slot is already booked. Please choose another one.");
+            appointment.Confirm(request.Request.PatientId);
+        }
+        catch (DomainException ex)
+        {
+            logger.LogWarning("Booking failed for appointment {AppointmentId} with Dr. {DoctorName}: {Reason}",
+                request.Request.AppointmentId, appointment.Doctor.FirstName + " " + appointment.Doctor.LastName, ex.Message);
+            throw new ConflictException(ex.Message);
         }
 
-        if ( appointment.Status == AppointmentStatus.Completed || appointment.Status == AppointmentStatus.Cancelled)
-        {
-            throw new ConflictException("This appointment is no longer available for booking. Please choose another one.");
-        }
-            
-        var patient = request.Request.PatientId;
-        appointment.PatientId = patient;
-        appointment.Status = AppointmentStatus.Confirmed;
         await dbContext.SaveChangesAsync(cancellationToken);
-        logger.LogInformation("Patient with id {PatientId} successfully booked Appointment {request.Request.AppointmentId}", request.Request.PatientId, request.Request.AppointmentId);
+        logger.LogInformation("Patient with id {PatientId} successfully booked Appointment {AppointmentId}", request.Request.PatientId, request.Request.AppointmentId);
+
+        var patient = await dbContext.Patients.AsNoTracking().FirstOrDefaultAsync(p => p.Id == request.Request.PatientId, cancellationToken);
+        if (patient is not null)
+        {
+            await mailer.SendEmailAsync(patient.Email, "Appointment Confirmed",
+                $"Hi {patient.FirstName}, your appointment with Dr. {appointment.Doctor.FirstName} {appointment.Doctor.LastName} on {appointment.AppointmentDate:f} is confirmed.");
+        }
+
         return appointment;
     }
 }

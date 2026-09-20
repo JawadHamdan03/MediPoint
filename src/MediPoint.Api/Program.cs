@@ -36,6 +36,7 @@ builder.Services.AddScoped<IJwtTokenServiceProvider, JwtTokenServiceProvider>();
 
 builder.Services.AddOpenAiChatClient(builder.Configuration);
 builder.Services.AddOpenApi();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddStorageRegisteration();
 
 builder.Services.AddMemoryCache(options =>
@@ -45,6 +46,9 @@ builder.Services.AddMemoryCache(options =>
 
 
 builder.Services.AddHostedService<NotifyAdminsPeriodiclyJob>();
+builder.Services.AddHostedService<AppointmentReminderJob>();
+builder.Services.AddHostedService<ExpiredRefreshTokenCleanupJob>();
+builder.Services.AddHostedService<StalePendingAppointmentsCleanupJob>();
 
 builder.Services.AddCors(options =>
 {
@@ -76,8 +80,8 @@ if (app.Environment.IsDevelopment())
 }
 app.UseExceptionHandler();
 app.UseHttpsRedirection();
-app.UseStaticFiles();
 app.UseCors("AllowAll");
+app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers().RequireRateLimiting("concurrent");

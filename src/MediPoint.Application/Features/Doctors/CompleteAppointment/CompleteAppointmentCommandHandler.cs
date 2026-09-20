@@ -2,29 +2,39 @@ using Mapster;
 using MediatR;
 using MediPoint.Application.Common;
 using MediPoint.Application.Common.Exceptions;
+using MediPoint.Application.Common.Services;
 using MediPoint.Application.Features.Doctors.AppointmentsQuery.DTOs;
-using MediPoint.Domain.Entities.Appointments.Enums;
+using MediPoint.Domain.Common.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
 namespace MediPoint.Application.Features.Doctors.CompleteAppointment;
 
-public class CompleteAppointmentCommandHandler(IAppDbContext dbContext) : IRequestHandler<CompleteAppointmentCommand, AppointmentResponse>
+public class CompleteAppointmentCommandHandler(IAppDbContext dbContext,IMailer mailer) : IRequestHandler<CompleteAppointmentCommand, AppointmentResponse>
 {
     public async Task<AppointmentResponse> Handle(CompleteAppointmentCommand request, CancellationToken cancellationToken)
     {
-        var appointment = await dbContext.Appointments
+        var appointment = await dbContext.Appointments.Include(a => a.Patient)
             .FirstOrDefaultAsync(a => a.Id == request.AppointmentId);
 
         if (appointment is null || appointment.DoctorId != request.DoctorId)
             throw new NotFoundException("Appointment", request.AppointmentId.ToString());
 
-        if (appointment.Status != AppointmentStatus.Confirmed)
-            throw new ConflictException("Only a confirmed appointment can be marked completed");
+        try
+        {
+            appointment.Complete(request.Notes);
+        }
+        catch (DomainException ex)
+        {
+            throw new ConflictException(ex.Message);
+        }
 
-        appointment.Status = AppointmentStatus.Completed;
-        if (request.Notes is not null)
-            appointment.Notes = request.Notes;
         await dbContext.SaveChangesAsync(cancellationToken);
+
+        if (appointment.Patient is not null)
+        {
+            await mailer.SendEmailAsync(appointment.Patient.Email, "Appointment Completed",
+                $"Hi {appointment.Patient.FirstName}, your appointment on {appointment.AppointmentDate:f} has been marked as completed.");
+        }
 
         return appointment.Adapt<AppointmentResponse>();
     }

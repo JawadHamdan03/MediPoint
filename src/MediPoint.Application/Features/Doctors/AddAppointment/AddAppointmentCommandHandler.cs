@@ -6,6 +6,7 @@ using System.Text;
 using Mapster;
 using MediPoint.Application.Common;
 using MediPoint.Application.Common.Exceptions;
+using MediPoint.Domain.Common.Exceptions;
 using MediPoint.Domain.Entities.Apointments;
 using MediPoint.Domain.Entities.Appointments.Enums;
 using Microsoft.EntityFrameworkCore;
@@ -31,7 +32,16 @@ public class AddAppointmentCommandHandler(IAppDbContext dbContext) : IRequestHan
         if (hasConflict)
             throw new ConflictException("Conflict in Appointment Dates");
 
-        var app = req.Adapt<Appointment>();
+        Appointment app;
+        try
+        {
+            app = Appointment.Create(req.DoctorId, req.AppointmentDate, req.Duration);
+        }
+        catch (DomainException ex)
+        {
+            throw new ConflictException(ex.Message);
+        }
+
         await dbContext.Appointments.AddAsync(app, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
         return app.Adapt<ApponitmentDTO>();

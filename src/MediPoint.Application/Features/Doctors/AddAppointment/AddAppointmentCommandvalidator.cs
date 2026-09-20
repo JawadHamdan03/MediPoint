@@ -9,7 +9,7 @@ public class AddAppointmentCommandvalidator : AbstractValidator<AddAppointmentCo
 {
     public AddAppointmentCommandvalidator()
     {
-        RuleFor(x=>x.appointment.Duration).NotEmpty();
+        RuleFor(x=>x.appointment.Duration).GreaterThan(0);
         RuleFor(x=>x.appointment.AppointmentDate).NotEmpty();
         RuleFor(x=>x.appointment.DoctorId).NotEmpty();
     }

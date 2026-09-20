@@ -1,9 +1,10 @@
 using MediPoint.Application.Common.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 
 namespace MediPoint.Infrastructure.Common.Services;
 
-public class LocalFileStorageService(IConfiguration configuration) : IFileStorageService
+public class LocalFileStorageService(IConfiguration configuration, IHttpContextAccessor httpContextAccessor) : IFileStorageService
 {
     public async Task<string> SaveAsync(Stream content, string fileName, CancellationToken cancellationToken)
     {
@@ -17,6 +18,11 @@ public class LocalFileStorageService(IConfiguration configuration) : IFileStorag
         await using var fileStream = new FileStream(filePath, FileMode.Create);
         await content.CopyToAsync(fileStream, cancellationToken);
 
-        return $"/uploads/users/{uniqueFileName}";
+        var relativeUrl = $"/uploads/users/{uniqueFileName}";
+        var request = httpContextAccessor.HttpContext?.Request;
+        if (request is null)
+            return relativeUrl;
+
+        return $"{request.Scheme}://{request.Host}{relativeUrl}";
     }
 }
