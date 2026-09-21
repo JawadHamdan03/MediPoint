@@ -11,6 +11,9 @@ import TodayAppointmentsPage from "../pages/doctor/TodayAppointmentsPage";
 import AddAppointmentPage from "../pages/doctor/AddAppointmentPage";
 import AddPrescriptionPage from "../pages/doctor/AddPrescriptionPage";
 import SearchDoctorsPage from "../pages/patient/SearchDoctorsPage";
+import MedicalRecordsPage from "../pages/patient/MedicalRecordsPage";
+import ChatPage from "../pages/patient/ChatPage";
+import ProfilePage from "../pages/patient/ProfilePage";
 
 const adminNavItems = [
   { to: "/admin", label: "Dashboard" },
@@ -26,7 +29,12 @@ const doctorNavItems = [
   { to: "/doctor/prescriptions/add", label: "Add Prescription" },
 ];
 
-const patientNavItems = [{ to: "/patient", label: "Search Doctors" }];
+const patientNavItems = [
+  { to: "/patient", label: "Search Doctors" },
+  { to: "/patient/medical-records", label: "Medical Records" },
+  { to: "/patient/chat", label: "Chat" },
+  { to: "/patient/profile", label: "Profile" },
+];
 
 export const router = createBrowserRouter([
   { path: "/", element: <Navigate to="/login" replace /> },
@@ -67,7 +75,12 @@ export const router = createBrowserRouter([
     children: [
       {
         element: <AppShell navItems={patientNavItems} title="Patient" />,
-        children: [{ index: true, element: <SearchDoctorsPage /> }],
+        children: [
+          { index: true, element: <SearchDoctorsPage /> },
+          { path: "medical-records", element: <MedicalRecordsPage /> },
+          { path: "chat", element: <ChatPage /> },
+          { path: "profile", element: <ProfilePage /> },
+        ],
       },
     ],
   },
