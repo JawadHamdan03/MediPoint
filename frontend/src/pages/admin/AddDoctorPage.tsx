@@ -3,10 +3,14 @@ import { addDoctor } from "../../api/admin";
 import type { DoctorDto } from "../../types/admin";
 import { Input } from "../../components/ui/Input";
 import { Select } from "../../components/ui/Select";
+import { Textarea } from "../../components/ui/Textarea";
 import { Button } from "../../components/ui/Button";
 import { Card } from "../../components/ui/Card";
+import { PageHeader } from "../../components/ui/PageHeader";
+import { UserPlusIcon } from "../../components/ui/icons";
 import { ErrorList } from "../../components/ui/ErrorList";
-import { formatError } from "../../lib/formatError";
+import { formatError, fieldErrors } from "../../lib/formatError";
+import { useToast } from "../../context/ToastContext";
 
 const initial: DoctorDto = {
   firstName: "",
@@ -25,9 +29,10 @@ const initial: DoctorDto = {
 };
 
 export default function AddDoctorPage() {
+  const toast = useToast();
   const [form, setForm] = useState<DoctorDto>(initial);
   const [errors, setErrors] = useState<string[]>([]);
-  const [success, setSuccess] = useState<string | null>(null);
+  const [fields, setFields] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
 
   function update<K extends keyof DoctorDto>(key: K, value: DoctorDto[K]) {
@@ -37,32 +42,57 @@ export default function AddDoctorPage() {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setErrors([]);
-    setSuccess(null);
+    setFields({});
     setSubmitting(true);
     try {
       const res = await addDoctor(form);
-      setSuccess(`Doctor ${res.firstName} ${res.lastName} added.`);
+      toast.notify(`Doctor ${res.firstName} ${res.lastName} added.`);
       setForm(initial);
     } catch (err) {
       setErrors(formatError(err));
+      setFields(fieldErrors(err));
     } finally {
       setSubmitting(false);
     }
   }
 
   return (
-    <Card className="mx-auto max-w-2xl">
-      <h2 className="mb-4 text-lg font-semibold text-(--text-h)">Add Doctor</h2>
+    <div className="mx-auto max-w-2xl">
+      <PageHeader icon={UserPlusIcon} title="Add Doctor" description="Onboard a new doctor account." />
+      <Card>
       <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <Input label="First name" required maxLength={50} value={form.firstName} onChange={(e) => update("firstName", e.target.value)} />
-        <Input label="Last name" required maxLength={50} value={form.lastName} onChange={(e) => update("lastName", e.target.value)} />
-        <Input label="Email" type="email" required maxLength={100} value={form.email} onChange={(e) => update("email", e.target.value)} />
+        <Input
+          label="First name"
+          required
+          maxLength={50}
+          value={form.firstName}
+          error={fields.firstname}
+          onChange={(e) => update("firstName", e.target.value)}
+        />
+        <Input
+          label="Last name"
+          required
+          maxLength={50}
+          value={form.lastName}
+          error={fields.lastname}
+          onChange={(e) => update("lastName", e.target.value)}
+        />
+        <Input
+          label="Email"
+          type="email"
+          required
+          maxLength={100}
+          value={form.email}
+          error={fields.email}
+          onChange={(e) => update("email", e.target.value)}
+        />
         <Input
           label="Password"
           type="password"
           required
           minLength={8}
           value={form.password}
+          error={fields.password}
           onChange={(e) => update("password", e.target.value)}
         />
         <Input
@@ -71,6 +101,7 @@ export default function AddDoctorPage() {
           placeholder="+15551234567"
           pattern="^\+?[1-9]\d{1,14}$"
           value={form.phoneNumber}
+          error={fields.phonenumber}
           onChange={(e) => update("phoneNumber", e.target.value)}
         />
         <Input
@@ -78,18 +109,27 @@ export default function AddDoctorPage() {
           type="date"
           required
           value={form.dateOfBirth}
+          error={fields.dateofbirth}
           onChange={(e) => update("dateOfBirth", e.target.value)}
         />
         <Select label="Gender" value={form.gender} onChange={(e) => update("gender", e.target.value as DoctorDto["gender"])}>
           <option value="Male">Male</option>
           <option value="Female">Female</option>
         </Select>
-        <Input label="Specialty" required maxLength={100} value={form.specialty} onChange={(e) => update("specialty", e.target.value)} />
+        <Input
+          label="Specialty"
+          required
+          maxLength={100}
+          value={form.specialty}
+          error={fields.specialty}
+          onChange={(e) => update("specialty", e.target.value)}
+        />
         <Input
           label="License number"
           required
           maxLength={50}
           value={form.licenseNumber}
+          error={fields.licensenumber}
           onChange={(e) => update("licenseNumber", e.target.value)}
         />
         <Input
@@ -98,6 +138,7 @@ export default function AddDoctorPage() {
           min={0}
           max={70}
           value={form.yearsOfExperience}
+          error={fields.yearsofexperience}
           onChange={(e) => update("yearsOfExperience", Number(e.target.value))}
         />
         <Input
@@ -106,19 +147,18 @@ export default function AddDoctorPage() {
           min={0}
           step="0.01"
           value={form.consultationFee}
+          error={fields.consultationfee}
           onChange={(e) => update("consultationFee", Number(e.target.value))}
         />
         <div className="sm:col-span-2">
-          <label className="flex flex-col gap-1 text-sm text-(--text)">
-            Biography
-            <textarea
-              maxLength={1000}
-              rows={3}
-              value={form.biography}
-              onChange={(e) => update("biography", e.target.value)}
-              className="rounded-md border border-(--border) px-3 py-2 text-(--text-h) outline-none focus:border-(--accent)"
-            />
-          </label>
+          <Textarea
+            label="Biography"
+            maxLength={1000}
+            rows={3}
+            value={form.biography}
+            error={fields.biography}
+            onChange={(e) => update("biography", e.target.value)}
+          />
         </div>
 
         {errors.length > 0 && (
@@ -126,7 +166,6 @@ export default function AddDoctorPage() {
             <ErrorList errors={errors} />
           </div>
         )}
-        {success && <p className="sm:col-span-2 text-sm text-green-600">{success}</p>}
 
         <div className="sm:col-span-2">
           <Button type="submit" disabled={submitting}>
@@ -134,6 +173,7 @@ export default function AddDoctorPage() {
           </Button>
         </div>
       </form>
-    </Card>
+      </Card>
+    </div>
   );
 }

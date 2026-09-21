@@ -3,7 +3,7 @@ export function Spinner({ className = "" }: { className?: string }) {
     <span
       role="status"
       aria-label="Loading"
-      className={`inline-block h-4 w-4 animate-spin rounded-full border-2 border-(--border) border-t-(--accent) ${className}`}
+      className={`inline-block h-5 w-5 animate-spin rounded-full border-2 border-(--border) border-t-(--accent) ${className}`}
     />
   );
 }

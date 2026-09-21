@@ -3,10 +3,14 @@ import { updateDoctor } from "../../api/admin";
 import type { UpdateDoctorDto } from "../../types/admin";
 import { Input } from "../../components/ui/Input";
 import { Select } from "../../components/ui/Select";
+import { Textarea } from "../../components/ui/Textarea";
 import { Button } from "../../components/ui/Button";
 import { Card } from "../../components/ui/Card";
+import { PageHeader } from "../../components/ui/PageHeader";
+import { UserEditIcon } from "../../components/ui/icons";
 import { ErrorList } from "../../components/ui/ErrorList";
-import { formatError } from "../../lib/formatError";
+import { formatError, fieldErrors } from "../../lib/formatError";
+import { useToast } from "../../context/ToastContext";
 
 const initial: UpdateDoctorDto = {
   firstName: "",
@@ -23,10 +27,11 @@ const initial: UpdateDoctorDto = {
 };
 
 export default function UpdateDoctorPage() {
+  const toast = useToast();
   const [doctorId, setDoctorId] = useState("");
   const [form, setForm] = useState<UpdateDoctorDto>(initial);
   const [errors, setErrors] = useState<string[]>([]);
-  const [success, setSuccess] = useState<string | null>(null);
+  const [fields, setFields] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
 
   function update<K extends keyof UpdateDoctorDto>(key: K, value: UpdateDoctorDto[K]) {
@@ -36,33 +41,50 @@ export default function UpdateDoctorPage() {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setErrors([]);
-    setSuccess(null);
+    setFields({});
     setSubmitting(true);
     try {
       const res = await updateDoctor(doctorId, form);
-      setSuccess(`Doctor ${res.firstName} ${res.lastName} updated.`);
+      toast.notify(`Doctor ${res.firstName} ${res.lastName} updated.`);
     } catch (err) {
       setErrors(formatError(err));
+      setFields(fieldErrors(err));
     } finally {
       setSubmitting(false);
     }
   }
 
   return (
-    <Card className="mx-auto max-w-2xl">
-      <h2 className="mb-4 text-lg font-semibold text-(--text-h)">Update Doctor</h2>
+    <div className="mx-auto max-w-2xl">
+      <PageHeader icon={UserEditIcon} title="Update Doctor" description="Edit an existing doctor's profile by id." />
+      <Card>
       <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="sm:col-span-2">
-          <Input label="Doctor id" required value={doctorId} onChange={(e) => setDoctorId(e.target.value)} />
+          <Input label="Doctor id" required value={doctorId} error={fields.doctorid} onChange={(e) => setDoctorId(e.target.value)} />
         </div>
-        <Input label="First name" required maxLength={50} value={form.firstName} onChange={(e) => update("firstName", e.target.value)} />
-        <Input label="Last name" required maxLength={50} value={form.lastName} onChange={(e) => update("lastName", e.target.value)} />
+        <Input
+          label="First name"
+          required
+          maxLength={50}
+          value={form.firstName}
+          error={fields.firstname}
+          onChange={(e) => update("firstName", e.target.value)}
+        />
+        <Input
+          label="Last name"
+          required
+          maxLength={50}
+          value={form.lastName}
+          error={fields.lastname}
+          onChange={(e) => update("lastName", e.target.value)}
+        />
         <Input
           label="Phone number"
           required
           placeholder="+15551234567"
           pattern="^\+?[1-9]\d{1,14}$"
           value={form.phoneNumber}
+          error={fields.phonenumber}
           onChange={(e) => update("phoneNumber", e.target.value)}
         />
         <Input
@@ -70,18 +92,27 @@ export default function UpdateDoctorPage() {
           type="date"
           required
           value={form.dateOfBirth}
+          error={fields.dateofbirth}
           onChange={(e) => update("dateOfBirth", e.target.value)}
         />
         <Select label="Gender" value={form.gender} onChange={(e) => update("gender", e.target.value as UpdateDoctorDto["gender"])}>
           <option value="Male">Male</option>
           <option value="Female">Female</option>
         </Select>
-        <Input label="Specialty" required maxLength={100} value={form.specialty} onChange={(e) => update("specialty", e.target.value)} />
+        <Input
+          label="Specialty"
+          required
+          maxLength={100}
+          value={form.specialty}
+          error={fields.specialty}
+          onChange={(e) => update("specialty", e.target.value)}
+        />
         <Input
           label="License number"
           required
           maxLength={50}
           value={form.licenseNumber}
+          error={fields.licensenumber}
           onChange={(e) => update("licenseNumber", e.target.value)}
         />
         <Input
@@ -90,6 +121,7 @@ export default function UpdateDoctorPage() {
           min={0}
           max={70}
           value={form.yearsOfExperience}
+          error={fields.yearsofexperience}
           onChange={(e) => update("yearsOfExperience", Number(e.target.value))}
         />
         <Input
@@ -98,27 +130,22 @@ export default function UpdateDoctorPage() {
           min={0}
           step="0.01"
           value={form.consultationFee}
+          error={fields.consultationfee}
           onChange={(e) => update("consultationFee", Number(e.target.value))}
         />
-        <label className="flex items-center gap-2 text-sm text-(--text)">
-          <input
-            type="checkbox"
-            checked={form.isAvailable}
-            onChange={(e) => update("isAvailable", e.target.checked)}
-          />
+        <label className="flex items-center gap-2 self-end pb-2 text-sm text-(--text)">
+          <input type="checkbox" checked={form.isAvailable} onChange={(e) => update("isAvailable", e.target.checked)} />
           Available
         </label>
         <div className="sm:col-span-2">
-          <label className="flex flex-col gap-1 text-sm text-(--text)">
-            Biography
-            <textarea
-              maxLength={1000}
-              rows={3}
-              value={form.biography}
-              onChange={(e) => update("biography", e.target.value)}
-              className="rounded-md border border-(--border) px-3 py-2 text-(--text-h) outline-none focus:border-(--accent)"
-            />
-          </label>
+          <Textarea
+            label="Biography"
+            maxLength={1000}
+            rows={3}
+            value={form.biography}
+            error={fields.biography}
+            onChange={(e) => update("biography", e.target.value)}
+          />
         </div>
 
         {errors.length > 0 && (
@@ -126,7 +153,6 @@ export default function UpdateDoctorPage() {
             <ErrorList errors={errors} />
           </div>
         )}
-        {success && <p className="sm:col-span-2 text-sm text-green-600">{success}</p>}
 
         <div className="sm:col-span-2">
           <Button type="submit" disabled={submitting}>
@@ -134,6 +160,7 @@ export default function UpdateDoctorPage() {
           </Button>
         </div>
       </form>
-    </Card>
+      </Card>
+    </div>
   );
 }

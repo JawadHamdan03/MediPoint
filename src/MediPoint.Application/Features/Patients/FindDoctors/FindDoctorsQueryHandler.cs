@@ -38,7 +38,7 @@ public class FindDoctorsQueryHandler(IAppDbContext dbContext,ILogger<FindDoctors
 
        
         
-        doctors = await dbContext.Doctors.AsNoTracking().Include(d=>d.Appointments).Where(d=>d.Specialty.Equals(request.speciality) && d.IsAvailable).ToListAsync();
+        doctors = await dbContext.Doctors.AsNoTracking().Include(d=>d.Appointments).Where(d=>d.Specialty.Contains(request.speciality) && d.IsAvailable).ToListAsync();
         if (doctors is null)
         {
             logger.LogInformation("No doctors were found");

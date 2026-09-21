@@ -14,26 +14,39 @@ import SearchDoctorsPage from "../pages/patient/SearchDoctorsPage";
 import MedicalRecordsPage from "../pages/patient/MedicalRecordsPage";
 import ChatPage from "../pages/patient/ChatPage";
 import ProfilePage from "../pages/patient/ProfilePage";
+import {
+  CalendarIcon,
+  CalendarPlusIcon,
+  ChatIcon,
+  DashboardIcon,
+  PillIcon,
+  ProfileIcon,
+  RecordsIcon,
+  SearchIcon,
+  UserEditIcon,
+  UserMinusIcon,
+  UserPlusIcon,
+} from "../components/ui/icons";
 
 const adminNavItems = [
-  { to: "/admin", label: "Dashboard" },
-  { to: "/admin/doctors/add", label: "Add Doctor" },
-  { to: "/admin/doctors/update", label: "Update Doctor" },
-  { to: "/admin/doctors/remove", label: "Remove Doctor" },
-  { to: "/admin/patients/register", label: "Register Patient" },
+  { to: "/admin", label: "Dashboard", icon: DashboardIcon },
+  { to: "/admin/doctors/add", label: "Add Doctor", icon: UserPlusIcon },
+  { to: "/admin/doctors/update", label: "Update Doctor", icon: UserEditIcon },
+  { to: "/admin/doctors/remove", label: "Remove Doctor", icon: UserMinusIcon },
+  { to: "/admin/patients/register", label: "Register Patient", icon: UserPlusIcon },
 ];
 
 const doctorNavItems = [
-  { to: "/doctor", label: "Today's Appointments" },
-  { to: "/doctor/appointments/add", label: "Add Appointment" },
-  { to: "/doctor/prescriptions/add", label: "Add Prescription" },
+  { to: "/doctor", label: "Today's Appointments", icon: CalendarIcon },
+  { to: "/doctor/appointments/add", label: "Add Appointment", icon: CalendarPlusIcon },
+  { to: "/doctor/prescriptions/add", label: "Add Prescription", icon: PillIcon },
 ];
 
 const patientNavItems = [
-  { to: "/patient", label: "Search Doctors" },
-  { to: "/patient/medical-records", label: "Medical Records" },
-  { to: "/patient/chat", label: "Chat" },
-  { to: "/patient/profile", label: "Profile" },
+  { to: "/patient", label: "Search Doctors", icon: SearchIcon },
+  { to: "/patient/medical-records", label: "Medical Records", icon: RecordsIcon },
+  { to: "/patient/chat", label: "Chat", icon: ChatIcon },
+  { to: "/patient/profile", label: "Profile", icon: ProfileIcon },
 ];
 
 export const router = createBrowserRouter([

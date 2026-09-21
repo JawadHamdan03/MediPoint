@@ -1,17 +1,17 @@
-import type { InputHTMLAttributes } from "react";
+import type { TextareaHTMLAttributes } from "react";
 
-interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   label: string;
   error?: string;
 }
 
-export function Input({ label, error, className = "", id, ...props }: InputProps) {
-  const inputId = id ?? label.toLowerCase().replace(/\s+/g, "-");
+export function Textarea({ label, error, className = "", id, ...props }: TextareaProps) {
+  const areaId = id ?? label.toLowerCase().replace(/\s+/g, "-");
   return (
-    <label htmlFor={inputId} className="flex flex-col gap-1.5 text-sm font-medium text-(--text)">
+    <label htmlFor={areaId} className="flex flex-col gap-1.5 text-sm font-medium text-(--text)">
       {label}
-      <input
-        id={inputId}
+      <textarea
+        id={areaId}
         className={`rounded-(--radius) border bg-(--surface) px-3 py-2 text-sm font-normal text-(--text-h) outline-none transition-colors duration-150 placeholder:text-(--text)/50 focus:border-(--accent) focus:ring-2 focus:ring-(--accent-bg) ${
           error ? "border-red-400" : "border-(--border)"
         } ${className}`}

@@ -1,0 +1,38 @@
+services:
+  backend:
+    build:
+      context: ./src
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      ASPNETCORE_HTTP_PORTS: "8080"
+      MediPoint__ConnectionString: ${MONGO_CONNECTION_STRING:-mongodb://host.docker.internal:27017}
+      MediPoint__DatabaseName: "MediPoint"
+      MediPoint__MedicalRecordsCollectionName: "MedicalRecords"
+      MediPoint__LabResultsCollectionName: "LabResults"
+      MediPoint__MedicineCollectionName: "Medicine"
+      ConnectionStrings__DefaultConnection: ${SQLSERVER_CONNECTION_STRING:-Server=host.docker.internal,1434;Database=MediPoint;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True;}
+      JwtSettings__Issuer: "localhost"
+      JwtSettings__Audience: "localhost"
+      JwtSettings__TokenExpirationInMinutes: "200"
+      JwtSettings__SecretKey: ${JWT_SECRET_KEY:-ThisIsAVeryStrongSecretKeyForYourDemoApplication123!}
+      OpenAI__ApiKey: ${OPENAI_API_KEY:-}
+      OpenAI__Model: "gpt-4o-mini"
+      SmtpSettings__Server: ${SMTP_SERVER:-smtp.gmail.com}
+      SmtpSettings__Port: ${SMTP_PORT:-587}
+      SmtpSettings__SenderName: ${SMTP_SENDER_NAME:-MediPoint}
+      SmtpSettings__SenderEmail: ${SMTP_SENDER_EMAIL:-HamdanJawad48@gmail.com}
+      SmtpSettings__Username: ${SMTP_USERNAME:-HamdanJawad48@gmail.com}
+      SmtpSettings__Password: ${SMTP_PASSWORD:-zxti ilwl siin hxag}
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:8080}
+    ports:
+      - "80:80"
+    depends_on:
+      - backend

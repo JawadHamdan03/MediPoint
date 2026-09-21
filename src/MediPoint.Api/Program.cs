@@ -69,7 +69,7 @@ using (var scope = app.Services.CreateScope())
 
     await dbContext.Database.MigrateAsync();
 
-    await UsersDataSeed.SeedUsers(services);
+   // await UsersDataSeed.SeedUsers(services);
 }
 
 

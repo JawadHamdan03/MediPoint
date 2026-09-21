@@ -1,10 +1,17 @@
-import { createContext, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { configureApiClient } from "../api/client";
 import { login as apiLogin, refresh as apiRefresh } from "../api/auth";
 import type { JwtClaims, LoginRequest, Role } from "../types/auth";
 
 const ACTIVE_ROLE_KEY = "medipoint_active_role";
 const refreshStorageKey = (role: Role) => `medipoint_refresh_${role}`;
+
+function getStoredSession(): { role: Role; token: string } | null {
+  const role = localStorage.getItem(ACTIVE_ROLE_KEY) as Role | null;
+  if (!role) return null;
+  const token = localStorage.getItem(refreshStorageKey(role));
+  return token ? { role, token } : null;
+}
 
 function decodeJwt(token: string): JwtClaims {
   const base64Url = token.split(".")[1];
@@ -38,7 +45,9 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AuthState>(emptyState);
-  const [status, setStatus] = useState<AuthStatus>("loading");
+  // A stored session needs an async refresh before we know if it's valid, so
+  // only that case starts in "loading"; everything else is known synchronously.
+  const [status, setStatus] = useState<AuthStatus>(() => (getStoredSession() ? "loading" : "unauthenticated"));
   // apiFetch's hooks are configured once and close over stale state, so
   // mirror the latest values into a ref they can read at call time.
   const stateRef = useRef(state);
@@ -94,25 +103,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       onAuthFailure: () => clearAuth(stateRef.current.role),
     });
 
-    const role = localStorage.getItem(ACTIVE_ROLE_KEY) as Role | null;
-    const stored = role ? localStorage.getItem(refreshStorageKey(role)) : null;
-    if (role && stored) {
-      apiRefresh(role, stored)
-        .then((res) => applyToken(role, res.accessToken!, res.refreshToken))
-        .catch(() => clearAuth(role));
-    } else {
-      setStatus("unauthenticated");
+    const session = getStoredSession();
+    if (session) {
+      apiRefresh(session.role, session.token)
+        .then((res) => applyToken(session.role, res.accessToken!, res.refreshToken))
+        .catch(() => clearAuth(session.role));
     }
     // Runs once: apiFetch's auth hooks and the bootstrap refresh both only
     // need to happen on initial mount.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const value = useMemo<AuthContextValue>(() => ({ ...state, status, login, logout }), [state, status]);
+  const value: AuthContextValue = { ...state, status, login, logout };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components -- small app: co-locating the hook with its provider is worth the fast-refresh tradeoff.
 export function useAuth(): AuthContextValue {
   const ctx = useContext(AuthContext);
   if (!ctx) {

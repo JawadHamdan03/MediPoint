@@ -8,18 +8,18 @@ interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
 export function Select({ label, error, className = "", id, children, ...props }: SelectProps) {
   const selectId = id ?? label.toLowerCase().replace(/\s+/g, "-");
   return (
-    <label htmlFor={selectId} className="flex flex-col gap-1 text-sm text-(--text)">
+    <label htmlFor={selectId} className="flex flex-col gap-1.5 text-sm font-medium text-(--text)">
       {label}
       <select
         id={selectId}
-        className={`rounded-md border bg-(--bg) px-3 py-2 text-(--text-h) outline-none focus:border-(--accent) ${
-          error ? "border-red-500" : "border-(--border)"
+        className={`rounded-(--radius) border bg-(--surface) px-3 py-2 text-sm font-normal text-(--text-h) outline-none transition-colors duration-150 focus:border-(--accent) focus:ring-2 focus:ring-(--accent-bg) ${
+          error ? "border-red-400" : "border-(--border)"
         } ${className}`}
         {...props}
       >
         {children}
       </select>
-      {error && <span className="text-xs text-red-500">{error}</span>}
+      {error && <span className="text-xs font-normal text-red-500">{error}</span>}
     </label>
   );
 }
