@@ -11,6 +11,7 @@ import RegisterPatientPage from "../pages/admin/RegisterPatientPage";
 import TodayAppointmentsPage from "../pages/doctor/TodayAppointmentsPage";
 import AddAppointmentPage from "../pages/doctor/AddAppointmentPage";
 import AddPrescriptionPage from "../pages/doctor/AddPrescriptionPage";
+import DoctorProfilePage from "../pages/doctor/ProfilePage";
 import SearchDoctorsPage from "../pages/patient/SearchDoctorsPage";
 import MedicalRecordsPage from "../pages/patient/MedicalRecordsPage";
 import ChatPage from "../pages/patient/ChatPage";
@@ -41,6 +42,7 @@ const doctorNavItems = [
   { to: "/doctor", label: "Today's Appointments", icon: CalendarIcon },
   { to: "/doctor/appointments/add", label: "Add Appointment", icon: CalendarPlusIcon },
   { to: "/doctor/prescriptions/add", label: "Add Prescription", icon: PillIcon },
+  { to: "/doctor/profile", label: "Profile", icon: ProfileIcon },
 ];
 
 const patientNavItems = [
@@ -80,6 +82,7 @@ export const router = createBrowserRouter([
           { index: true, element: <TodayAppointmentsPage /> },
           { path: "appointments/add", element: <AddAppointmentPage /> },
           { path: "prescriptions/add", element: <AddPrescriptionPage /> },
+          { path: "profile", element: <DoctorProfilePage /> },
         ],
       },
     ],
