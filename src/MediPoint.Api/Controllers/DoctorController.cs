@@ -11,6 +11,8 @@ using MediPoint.Application.Features.Doctors.AddAppointment;
 using MediPoint.Application.Features.Doctors.DoctorRefreshToken;
 using MediPoint.Application.Features.Doctors.CompleteAppointment;
 using MediPoint.Application.Features.Doctors.CompleteAppointment.DTOs;
+using MediPoint.Application.Features.Doctors.SignUp;
+using MediPoint.Application.Features.Doctors.SignUp.DTOs;
 
 namespace MediPoint.Api.Controllers;
 
@@ -21,6 +23,13 @@ namespace MediPoint.Api.Controllers;
 
 public class DoctorController(IMediator mediator) : ControllerBase
 {
+    [HttpPost("sign-up")]
+    public async Task<IActionResult> SignUp(DoctorSignUpDto signUpRequest)
+    {
+        var res = await mediator.Send(new SignUpDoctorCommand(signUpRequest));
+        return Ok(res);
+    }
+
     [HttpPost("login")]
     public async Task<IActionResult> login(LoginRequest loginRequest)
     {

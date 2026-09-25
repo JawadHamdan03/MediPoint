@@ -14,6 +14,8 @@ using MediPoint.Application.Features.Patients.UpdateDetails;
 using MediPoint.Application.Features.Patients.UpdateDetails.DTOs;
 using MediPoint.Application.Features.Patients.Chat;
 using MediPoint.Application.Features.Patients.Chat.DTOs;
+using MediPoint.Application.Features.Patients.SignUp;
+using MediPoint.Application.Features.Patients.SignUp.DTOs;
 
 namespace MediPoint.Api.Controllers;
 
@@ -22,6 +24,13 @@ namespace MediPoint.Api.Controllers;
 [ApiController]
 public class PatientController(IMediator mediator) : ControllerBase
 {
+    [HttpPost("sign-up")]
+    public async Task<IActionResult> SignUp(PatientSignUpDto signUpRequest)
+    {
+        var res = await mediator.Send(new SignUpPatientCommand(signUpRequest));
+        return Ok(res);
+    }
+
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginRequest loginRequest)
     {
