@@ -9,19 +9,29 @@
 ![Clean Architecture](https://img.shields.io/badge/Clean_Architecture-2496ED?style=flat-square)
 ![CQRS](https://img.shields.io/badge/CQRS-Pattern-orange?style=flat-square)
 ![REST API](https://img.shields.io/badge/REST-API-0078D4?style=flat-square)
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black&style=flat-square)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white&style=flat-square)
+![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white&style=flat-square)
+![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss&logoColor=white&style=flat-square)
+![React Router](https://img.shields.io/badge/React_Router-7-CA4245?logo=reactrouter&logoColor=white&style=flat-square)
+![JWT](https://img.shields.io/badge/Auth-JWT-000000?logo=jsonwebtokens&logoColor=white&style=flat-square)
 ![CI](https://img.shields.io/badge/CI-GitHub_Actions-2088FF?logo=githubactions&logoColor=white&style=flat-square)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white&style=flat-square)
+![ESLint](https://img.shields.io/badge/ESLint-4B32C3?logo=eslint&logoColor=white&style=flat-square)
 ![xUnit](https://img.shields.io/badge/Tests-xUnit-5C2D91?logo=nunit&logoColor=white&style=flat-square)
 ![AI Assistant](https://img.shields.io/badge/AI-OpenAI_Agent-412991?logo=openai&logoColor=white&style=flat-square)
 ![Background Jobs](https://img.shields.io/badge/Background-Hosted_Services-6E40C9?style=flat-square)
 ![Email](https://img.shields.io/badge/Email-MailKit_SMTP-D14836?logo=maildotru&logoColor=white&style=flat-square)
 ![Rate Limiting](https://img.shields.io/badge/Rate_Limiting-Enabled-yellow?style=flat-square)
+![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-brightgreen?style=flat-square)
 ![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
 
 **Smart Healthcare Appointment System** — a comprehensive role-based REST API for booking and managing medical appointments, built with **.NET 10 / ASP.NET Core** using Clean Architecture and CQRS patterns.
 
 ### Overview
-Patients search for doctors by specialty, book, cancel, and review appointments. Doctors manage their schedules, complete visits, and issue prescriptions. Admins manage doctors and register patients. Authentication is JWT-based with per-role refresh tokens. Relational data lives in **SQL Server**; medical records, prescriptions' medicines, and lab results live in **MongoDB** for flexible document storage.
+Patients search for doctors by specialty, book, cancel, and review appointments. Doctors manage their schedules, complete visits, and issue prescriptions. Admins manage doctors and register patients. Patients and doctors can also self-register (sign up) directly. Authentication is JWT-based with per-role refresh tokens, and the token payload carries enough profile info (name, role, avatar) to render a signed-in user badge without an extra round trip. Relational data lives in **SQL Server**; medical records, prescriptions' medicines, and lab results live in **MongoDB** for flexible document storage.
+
+A **React + TypeScript** SPA (`frontend/`) consumes the API end-to-end — login/sign-up, role-based dashboards, and profile photo upload.
 
 ---
 
@@ -60,7 +70,7 @@ Patients search for doctors by specialty, book, cancel, and review appointments.
 ## ✨ Features
 
 ### 👤 Patient
-- Register (via Admin), log in, and refresh tokens
+- Self-register (sign up) or be registered by an Admin; log in and refresh tokens
 - Search available doctors by specialty (soft-removed doctors are excluded)
 - Book an open appointment slot
 - Cancel an own appointment (with optional reason)
@@ -70,7 +80,7 @@ Patients search for doctors by specialty, book, cancel, and review appointments.
 - Chat with an AI assistant that can search doctors and pull the patient's own medical records
 
 ### 🏥 Doctor
-- Log in and refresh tokens
+- Self-register (sign up) or be onboarded by an Admin; log in and refresh tokens
 - View today's appointments
 - Create appointment slots (with overlap detection)
 - Mark a confirmed appointment as completed
@@ -115,6 +125,10 @@ Patients search for doctors by specialty, book, cancel, and review appointments.
 | **Testing** | xUnit, NSubstitute |
 | **CI/CD** | GitHub Actions (`restore` → `build` → `test`) |
 | **Containerization** | Docker |
+| **Frontend** | React 19, TypeScript, Vite 8 |
+| **Frontend Styling** | Tailwind CSS 4 |
+| **Frontend Routing** | React Router 7 |
+| **Frontend Linting** | ESLint 10, typescript-eslint |
 
 ## 🏗️ Architecture
 
@@ -169,6 +183,15 @@ MediPoint/
 ├── docs/
 │   └── ai-assistant.md                # AI chat feature design writeup
 ├── .github/workflows/ci.yml           # GitHub Actions: restore → build → test
+├── frontend/                          # React + TypeScript SPA (Vite)
+│   ├── src/
+│   │   ├── api/                       # Fetch wrappers per feature area (auth, admin, doctor, patient, users)
+│   │   ├── context/                   # AuthContext (session/token state), ToastContext
+│   │   ├── pages/                     # auth/admin/doctor/patient route components
+│   │   ├── routes/                    # react-router-dom router + ProtectedRoute
+│   │   ├── components/                # ui/ (Button, Card, Input…) + layout/ (AppShell)
+│   │   └── types/                     # DTOs mirroring the API's request/response shapes
+│   └── package.json
 ├── src/
 │   ├── Dockerfile
 │   ├── MediPoint.Api/                 # Web API host
@@ -182,9 +205,9 @@ MediPoint/
 │   │   └── Features/
 │   │       ├── Admins/                # Login, RefreshToken, AdminAddsDoctor,
 │   │       │                          #   UpdateDoctor, RemoveDoctor, RegisterPatient
-│   │       ├── Doctors/               # Login, RefreshToken, AddAppointment,
+│   │       ├── Doctors/               # Login, SignUp, RefreshToken, AddAppointment,
 │   │       │                          #   AppointmentsQuery, AddPrescription, CompleteAppointment
-│   │       ├── Patients/              # Login, RefreshPatientToken, FindDoctors,
+│   │       ├── Patients/              # Login, SignUp, RefreshPatientToken, FindDoctors,
 │   │       │                          #   BookAppointment, CancelAppointment,
 │   │       │                          #   UpdateDetails, GetRecords, Chat (AI assistant)
 │   │       └── Users/                 # UploadProfileImage (shared across roles)
@@ -255,6 +278,16 @@ The API is served at **https://localhost:7213**:
 
 > The dev server is HTTPS-only with a self-signed certificate. When using an external client (ApiDog/Postman/curl), disable TLS verification or trust the dev cert (`dotnet dev-certs https --trust`).
 
+### Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev      # Vite dev server, proxies to the API via VITE_API_URL
+```
+
+Set `VITE_API_URL` (e.g. in `frontend/.env`) to the API's base URL (`https://localhost:7213`).
+
 ---
 
 ## ⚙️ Configuration
@@ -308,9 +341,25 @@ A set of sample appointments (various statuses) is also seeded.
 
 Base URL: `https://localhost:7213`. All non-auth endpoints require an `Authorization: Bearer <token>` header for the matching role. Enums are serialized as **strings** (`"Male"`, `"Confirmed"`).
 
+Every login, sign-up, and refresh-token endpoint returns the same `JwtTokenResponse` shape:
+
+```jsonc
+{
+  "accessToken": "...",
+  "refreshToken": "...",
+  "expiresAt": "2026-09-25T12:00:00Z",
+  "userId": "...",
+  "firstName": "...",
+  "lastName": "...",
+  "role": "Patient",
+  "imageUrl": null // set once a profile photo has been uploaded via /users/profile-image
+}
+```
+
 ### Patient — `/patients`
 | Method | Route | Auth | Description |
 |---|---|---|---|
+| POST | `/patients/sign-up` | — | Self-register; returns access + refresh tokens (auto-login) |
 | POST | `/patients/login` | — | Authenticate; returns access + refresh tokens |
 | POST | `/patients/refresh-token` | — | Exchange `{ refreshToken }` for a new token pair |
 | GET | `/patients/search-doctors/{speciality}` | Patient | List available doctors (+ their slots) by specialty |
@@ -328,6 +377,7 @@ Base URL: `https://localhost:7213`. All non-auth endpoints require an `Authoriza
 ### Doctor — `/api/Doctor`
 | Method | Route | Auth | Description |
 |---|---|---|---|
+| POST | `/api/Doctor/sign-up` | — | Self-register; returns access + refresh tokens (auto-login) |
 | POST | `/api/Doctor/login` | — | Authenticate |
 | POST | `/api/Doctor/refreshToken` | — | Raw JSON-string body: `"<refreshToken>"` |
 | GET | `/api/Doctor/get-Appointments-today` | Doctor | Today's appointments for the doctor |
@@ -390,6 +440,6 @@ Every exception in the codebase is a typed domain exception with proper error ma
 
 <div align="center">
 
-**Built with .NET 10 · Clean Architecture · CQRS**
+**Built with .NET 10 · React · Clean Architecture · CQRS**
 
 </div>
