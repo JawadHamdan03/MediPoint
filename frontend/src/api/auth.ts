@@ -1,8 +1,15 @@
 import { apiFetch } from "./client";
-import type { JwtTokenResponse, LoginRequest, Role } from "../types/auth";
+import type { DoctorSignUpDto, JwtTokenResponse, LoginRequest, PatientSignUpDto, Role, SignUpRole } from "../types/auth";
 
 export function login(role: Role, request: LoginRequest): Promise<JwtTokenResponse> {
   const path = role === "Admin" ? "/api/Admin/login" : role === "Doctor" ? "/api/Doctor/login" : "/patients/login";
+  return apiFetch<JwtTokenResponse>(path, { method: "POST", body: request, auth: false });
+}
+
+export function signUp(role: "Doctor", request: DoctorSignUpDto): Promise<JwtTokenResponse>;
+export function signUp(role: "Patient", request: PatientSignUpDto): Promise<JwtTokenResponse>;
+export function signUp(role: SignUpRole, request: DoctorSignUpDto | PatientSignUpDto): Promise<JwtTokenResponse> {
+  const path = role === "Doctor" ? "/api/Doctor/sign-up" : "/patients/sign-up";
   return apiFetch<JwtTokenResponse>(path, { method: "POST", body: request, auth: false });
 }
 

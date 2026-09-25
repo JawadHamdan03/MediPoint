@@ -44,7 +44,8 @@ function NavLinks({ navItems, onNavigate }: { navItems: NavItem[]; onNavigate?: 
 
 export function AppShell({ navItems, title }: { navItems: NavItem[]; title: string }) {
   const auth = useAuth();
-  const displayName = auth.role ?? "";
+  const fullName = [auth.firstName, auth.lastName].filter(Boolean).join(" ");
+  const displayName = fullName || auth.role || "";
 
   return (
     <div className="flex min-h-screen bg-(--bg)">
@@ -60,7 +61,7 @@ export function AppShell({ navItems, title }: { navItems: NavItem[]; title: stri
         </nav>
 
         <div className="mt-auto flex items-center gap-2.5 rounded-(--radius) border border-(--border) p-2.5">
-          <Avatar name={displayName} size="sm" />
+          <Avatar name={displayName} imageUrl={auth.imageUrl} size="sm" />
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-medium text-(--text-h)">{displayName}</p>
             <p className="truncate text-xs text-(--text)">Signed in</p>

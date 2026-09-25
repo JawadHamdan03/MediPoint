@@ -11,6 +11,7 @@ import { CameraIcon, ProfileIcon } from "../../components/ui/icons";
 import { ErrorList } from "../../components/ui/ErrorList";
 import { formatError, fieldErrors } from "../../lib/formatError";
 import { useToast } from "../../context/ToastContext";
+import { useAuth } from "../../context/AuthContext";
 
 const initial: UpdatePatientDto = {
   firstName: "",
@@ -26,6 +27,7 @@ const initial: UpdatePatientDto = {
 
 export default function ProfilePage() {
   const toast = useToast();
+  const auth = useAuth();
   const [form, setForm] = useState<UpdatePatientDto>(initial);
   const [errors, setErrors] = useState<string[]>([]);
   const [fields, setFields] = useState<Record<string, string>>({});
@@ -33,7 +35,6 @@ export default function ProfilePage() {
 
   const [imageErrors, setImageErrors] = useState<string[]>([]);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
@@ -70,7 +71,7 @@ export default function ProfilePage() {
     setUploading(true);
     try {
       const res = await uploadProfileImage(file);
-      setImageUrl(res.imageUrl);
+      auth.setProfileImage(res.imageUrl);
       toast.notify("Profile photo updated.");
     } catch (err) {
       setImageErrors(formatError(err));
@@ -79,7 +80,7 @@ export default function ProfilePage() {
     }
   }
 
-  const displayedImage = previewUrl ?? imageUrl;
+  const displayedImage = previewUrl ?? auth.imageUrl;
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-6">

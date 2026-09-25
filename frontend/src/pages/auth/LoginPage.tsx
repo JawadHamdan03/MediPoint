@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { Input } from "../../components/ui/Input";
 import { Button } from "../../components/ui/Button";
@@ -98,6 +98,13 @@ export default function LoginPage() {
             </Button>
           </form>
         </Card>
+
+        <p className="mt-4 text-center text-sm text-(--text)">
+          New to MediPoint?{" "}
+          <Link to="/signup" className="font-medium text-(--accent)">
+            Create an account
+          </Link>
+        </p>
       </div>
     </div>
   );

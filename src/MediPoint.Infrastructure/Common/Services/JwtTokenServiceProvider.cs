@@ -78,7 +78,12 @@ public class JwtTokenServiceProvider(AppDbContext dbContext,IConfiguration confi
         {
             AccessToken = tokenHandler.WriteToken(securityToken),
             RefreshToken = refToken,
-            ExpiresAt = expiry
+            ExpiresAt = expiry,
+            UserId = user.Id,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            Role = role,
+            ImageUrl = user.ImageUrl
         };
 
     }

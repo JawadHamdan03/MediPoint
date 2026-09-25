@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate } from "react-router-dom";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { AppShell } from "../components/layout/AppShell";
 import LoginPage from "../pages/auth/LoginPage";
+import SignUpPage from "../pages/auth/SignUpPage";
 import DashboardPage from "../pages/admin/DashboardPage";
 import AddDoctorPage from "../pages/admin/AddDoctorPage";
 import UpdateDoctorPage from "../pages/admin/UpdateDoctorPage";
@@ -52,6 +53,7 @@ const patientNavItems = [
 export const router = createBrowserRouter([
   { path: "/", element: <Navigate to="/login" replace /> },
   { path: "/login", element: <LoginPage /> },
+  { path: "/signup", element: <SignUpPage /> },
   {
     path: "/admin",
     element: <ProtectedRoute role="Admin" />,
