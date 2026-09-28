@@ -13,8 +13,7 @@ public class CompleteAppointmentCommandHandler(IAppDbContext dbContext,IMailer m
 {
     public async Task<AppointmentResponse> Handle(CompleteAppointmentCommand request, CancellationToken cancellationToken)
     {
-        var appointment = await dbContext.Appointments.Include(a => a.Patient)
-            .FirstOrDefaultAsync(a => a.Id == request.AppointmentId);
+        var appointment = await dbContext.Appointments.FirstOrDefaultAsync(a => a.Id == request.AppointmentId);
 
         if (appointment is null || appointment.DoctorId != request.DoctorId)
             throw new NotFoundException("Appointment", request.AppointmentId.ToString());
@@ -30,10 +29,11 @@ public class CompleteAppointmentCommandHandler(IAppDbContext dbContext,IMailer m
 
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        if (appointment.Patient is not null)
+        var patient = await dbContext.Patients.AsNoTracking().FirstOrDefaultAsync(p => p.Id == appointment.PatientId, cancellationToken);
+        if (patient is not null)
         {
-            await mailer.SendEmailAsync(appointment.Patient.Email, "Appointment Completed",
-                $"Hi {appointment.Patient.FirstName}, your appointment on {appointment.AppointmentDate:f} has been marked as completed.");
+            await mailer.SendEmailAsync(patient.Email, "Appointment Completed",
+                $"Hi {patient.FirstName}, your appointment on {appointment.AppointmentDate:f} has been marked as completed.");
         }
 
         return appointment.Adapt<AppointmentResponse>();
