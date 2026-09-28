@@ -7,6 +7,7 @@ import { Card } from "../../components/ui/Card";
 import { ErrorList } from "../../components/ui/ErrorList";
 import { formatError } from "../../lib/formatError";
 import { ProfileIcon, StethoscopeIcon, DashboardIcon } from "../../components/ui/icons";
+import { ThemeToggle } from "../../components/ui/ThemeToggle";
 import type { Role } from "../../types/auth";
 
 const ROLES: { role: Role; icon: typeof ProfileIcon }[] = [
@@ -47,6 +48,7 @@ export default function LoginPage() {
         aria-hidden
         className="pointer-events-none absolute -top-32 left-1/2 h-80 w-[36rem] -translate-x-1/2 rounded-full bg-(--accent) opacity-[0.12] blur-3xl"
       />
+      <ThemeToggle className="absolute top-4 right-4" />
       <div className="relative w-full max-w-sm">
         <div className="mb-6 flex flex-col items-center gap-2 text-center">
           <span className="flex h-11 w-11 items-center justify-center rounded-(--radius) bg-(--accent) text-lg font-bold text-white shadow-(--shadow)">

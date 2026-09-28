@@ -3,6 +3,7 @@ import { NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { Button } from "../ui/Button";
 import { Avatar } from "../ui/Avatar";
+import { ThemeToggle } from "../ui/ThemeToggle";
 import { LogoutIcon } from "../ui/icons";
 
 export interface NavItem {
@@ -54,7 +55,8 @@ export function AppShell({ navItems, title }: { navItems: NavItem[]; title: stri
           <span className="flex h-8 w-8 items-center justify-center rounded-(--radius) bg-(--accent) text-sm font-bold text-white">
             M
           </span>
-          <p className="text-lg font-semibold text-(--text-h)">MediPoint</p>
+          <p className="flex-1 text-lg font-semibold text-(--text-h)">MediPoint</p>
+          <ThemeToggle />
         </div>
         <nav className="flex flex-col gap-1">
           <NavLinks navItems={navItems} />
@@ -86,6 +88,7 @@ export function AppShell({ navItems, title }: { navItems: NavItem[]; title: stri
             <h1 className="text-lg font-semibold text-(--text-h)">{title}</h1>
           </div>
           <div className="flex items-center gap-3">
+            <ThemeToggle className="md:hidden" />
             <span className={`hidden rounded-full px-2.5 py-1 text-xs font-medium sm:inline-block ${roleBadgeClasses[auth.role ?? ""] ?? ""}`}>
               {auth.role}
             </span>
