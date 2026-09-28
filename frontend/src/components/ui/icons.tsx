@@ -74,6 +74,17 @@ export function CalendarPlusIcon(props: IconProps) {
   );
 }
 
+export function RepeatIcon(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <path d="M17 2.5l3 3-3 3" />
+      <path d="M20 5.5H8a5 5 0 0 0-5 5v1" />
+      <path d="M7 21.5l-3-3 3-3" />
+      <path d="M4 18.5h12a5 5 0 0 0 5-5v-1" />
+    </svg>
+  );
+}
+
 export function PillIcon(props: IconProps) {
   return (
     <svg {...base(props)}>

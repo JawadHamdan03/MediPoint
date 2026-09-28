@@ -25,7 +25,7 @@ public class Appointment : BaseEntity
     public string? CancellationReason { get; private set; }
 
 
-    public Guid PatientId { get; private set; }
+    public Guid? PatientId { get; private set; }
     public Patient? Patient { get; set; }
 
     public Guid DoctorId { get; private set; }

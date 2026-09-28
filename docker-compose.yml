@@ -1,18 +1,52 @@
 services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${SQLSERVER_SA_PASSWORD:-YourStrong!Passw0rd}
+    ports:
+      - "1434:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -Q 'SELECT 1' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  mongodb:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
   backend:
     build:
       context: ./src
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
     environment:
       ASPNETCORE_HTTP_PORTS: "8080"
-      MediPoint__ConnectionString: ${MONGO_CONNECTION_STRING:-mongodb://host.docker.internal:27017}
+      MediPoint__ConnectionString: ${MONGO_CONNECTION_STRING:-mongodb://mongodb:27017}
       MediPoint__DatabaseName: "MediPoint"
       MediPoint__MedicalRecordsCollectionName: "MedicalRecords"
       MediPoint__LabResultsCollectionName: "LabResults"
       MediPoint__MedicineCollectionName: "Medicine"
-      ConnectionStrings__DefaultConnection: ${SQLSERVER_CONNECTION_STRING:-Server=host.docker.internal,1434;Database=MediPoint;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True;}
+      ConnectionStrings__DefaultConnection: ${SQLSERVER_CONNECTION_STRING:-Server=sqlserver,1433;Database=MediPoint;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True;}
       JwtSettings__Issuer: "localhost"
       JwtSettings__Audience: "localhost"
       JwtSettings__TokenExpirationInMinutes: "200"
@@ -36,3 +70,7 @@ services:
       - "80:80"
     depends_on:
       - backend
+
+volumes:
+  sqlserver_data:
+  mongodb_data:

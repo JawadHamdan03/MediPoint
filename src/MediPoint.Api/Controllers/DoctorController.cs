@@ -13,6 +13,8 @@ using MediPoint.Application.Features.Doctors.CompleteAppointment;
 using MediPoint.Application.Features.Doctors.CompleteAppointment.DTOs;
 using MediPoint.Application.Features.Doctors.SignUp;
 using MediPoint.Application.Features.Doctors.SignUp.DTOs;
+using MediPoint.Application.Features.Doctors.GenerateAppointmentSlots;
+using MediPoint.Application.Features.Doctors.GenerateAppointmentSlots.DTOs;
 
 namespace MediPoint.Api.Controllers;
 
@@ -70,6 +72,15 @@ public class DoctorController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> addAppointment(MediPoint.Application.Features.Doctors.AddAppointment.DTOs.ApponitmentDTO appointment)
     {
         var res = await mediator.Send(new AddAppointmentCommand(appointment));
+        return Ok(res);
+    }
+
+    [Authorize(Roles = "Doctor")]
+    [HttpPost("generate-slots")]
+    public async Task<IActionResult> generateSlots(GenerateAppointmentSlotsRequest request)
+    {
+        var docId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var res = await mediator.Send(new GenerateAppointmentSlotsCommand(Guid.Parse(docId!), request));
         return Ok(res);
     }
 

@@ -43,3 +43,20 @@ export interface ApponitmentDTO {
 export interface CompleteAppointmentRequest {
   notes?: string | null;
 }
+
+export type DayOfWeekName = "Sunday" | "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday" | "Saturday";
+
+export interface GenerateAppointmentSlotsRequest {
+  startDate: string; // yyyy-MM-dd
+  endDate: string; // yyyy-MM-dd
+  daysOfWeek: DayOfWeekName[];
+  startTime: string; // HH:mm
+  endTime: string; // HH:mm
+  slotDurationMinutes: number;
+}
+
+export interface GenerateAppointmentSlotsResult {
+  created: number;
+  skipped: number;
+  slots: ApponitmentDTO[];
+}

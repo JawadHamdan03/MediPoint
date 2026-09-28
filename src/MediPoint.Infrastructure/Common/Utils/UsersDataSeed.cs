@@ -4,6 +4,7 @@ using MediPoint.Domain.Entities.User.Shared.Enums;
 using MediPoint.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,10 +18,12 @@ public static class UsersDataSeed
         var dbContext = serviceProvider.GetService<AppDbContext>();
         if (dbContext == null) return;
 
+        var logger = serviceProvider.GetRequiredService<ILoggerFactory>().CreateLogger(nameof(UsersDataSeed));
+
         await SeedAdmins(dbContext);
         await SeedDoctors(dbContext);
         await SeedPatients(dbContext);
-        await SeedAppointments(dbContext);
+        await SeedAppointments(dbContext, logger);
     }
 
     private static async Task SeedAdmins(AppDbContext dbContext)
@@ -389,7 +392,7 @@ public static class UsersDataSeed
         await dbContext.SaveChangesAsync();
     }
 
-    private static async Task SeedAppointments(AppDbContext dbContext)
+    private static async Task SeedAppointments(AppDbContext dbContext, ILogger logger)
     {
         if (await dbContext.Appointments.AnyAsync()) return;
 
@@ -400,30 +403,55 @@ public static class UsersDataSeed
 
         var appointments = new List<Appointment>();
 
+        // Demo seed data assumes the full seeded doctor/patient lists exist. If either table
+        // was already partially populated (e.g. a real signup happened before seeding ran),
+        // some of these emails may be missing — skip that appointment rather than crashing startup.
+        bool TryResolve(string doctorEmail, string patientEmail, out Doctor doctor, out Patient patient)
+        {
+            var doctorFound = doctorsByEmail.TryGetValue(doctorEmail, out doctor!);
+            var patientFound = patientsByEmail.TryGetValue(patientEmail, out patient!);
+            if (!doctorFound || !patientFound)
+            {
+                logger.LogWarning(
+                    "Skipping seeded appointment: doctor {DoctorEmail} found={DoctorFound}, patient {PatientEmail} found={PatientFound}",
+                    doctorEmail, doctorFound, patientEmail, patientFound);
+                return false;
+            }
+            return true;
+        }
+
         void AddConfirmed(string doctorEmail, string patientEmail, DateTime start, int minutes, string reason)
         {
-            var appointment = Appointment.Create(doctorsByEmail[doctorEmail].Id, start, minutes, reason);
-            appointment.Confirm(patientsByEmail[patientEmail].Id);
+            if (!TryResolve(doctorEmail, patientEmail, out var doctor, out var patient)) return;
+            var appointment = Appointment.Create(doctor.Id, start, minutes, reason);
+            appointment.Confirm(patient.Id);
             appointments.Add(appointment);
         }
 
         void AddOpenSlot(string doctorEmail, DateTime start, int minutes, string reason)
         {
-            appointments.Add(Appointment.Create(doctorsByEmail[doctorEmail].Id, start, minutes, reason));
+            if (!doctorsByEmail.TryGetValue(doctorEmail, out var doctor))
+            {
+                logger.LogWarning("Skipping seeded open slot: doctor {DoctorEmail} not found", doctorEmail);
+                return;
+            }
+            appointments.Add(Appointment.Create(doctor.Id, start, minutes, reason));
         }
 
         void AddCompleted(string doctorEmail, string patientEmail, DateTime start, int minutes, string reason, string notes)
         {
-            var appointment = Appointment.Create(doctorsByEmail[doctorEmail].Id, start, minutes, reason);
-            appointment.Confirm(patientsByEmail[patientEmail].Id);
+            if (!TryResolve(doctorEmail, patientEmail, out var doctor, out var patient)) return;
+            var appointment = Appointment.Create(doctor.Id, start, minutes, reason);
+            appointment.Confirm(patient.Id);
             appointment.Complete(notes);
             appointments.Add(appointment);
         }
 
         void AddCancelled(string doctorEmail, string patientEmail, DateTime start, int minutes, string reason, string cancellationReason)
         {
-            var appointment = Appointment.Create(doctorsByEmail[doctorEmail].Id, start, minutes, reason);
-            appointment.Confirm(patientsByEmail[patientEmail].Id);
+            if (!TryResolve(doctorEmail, patientEmail, out var doctor, out var patient)) return;
+            var appointment = Appointment.Create(doctor.Id, start, minutes, reason);
+            appointment.Confirm(patient.Id);
             appointment.Cancel(cancellationReason);
             appointments.Add(appointment);
         }

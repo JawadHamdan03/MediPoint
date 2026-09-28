@@ -3,6 +3,8 @@ import type {
   ApponitmentDTO,
   AppointmentResponse,
   CompleteAppointmentRequest,
+  GenerateAppointmentSlotsRequest,
+  GenerateAppointmentSlotsResult,
   PrescriptionRequest,
   PrescriptionResponse,
 } from "../types/doctor";
@@ -19,6 +21,12 @@ export function addAppointment(
   appointment: Pick<ApponitmentDTO, "appointmentDate" | "duration" | "doctorId">,
 ): Promise<ApponitmentDTO> {
   return apiFetch<ApponitmentDTO>("/api/Doctor/add-appointment", { method: "POST", body: appointment });
+}
+
+export function generateAppointmentSlots(
+  request: GenerateAppointmentSlotsRequest,
+): Promise<GenerateAppointmentSlotsResult> {
+  return apiFetch<GenerateAppointmentSlotsResult>("/api/Doctor/generate-slots", { method: "POST", body: request });
 }
 
 export function completeAppointment(

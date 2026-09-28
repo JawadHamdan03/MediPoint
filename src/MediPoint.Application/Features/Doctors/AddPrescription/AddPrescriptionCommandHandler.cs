@@ -24,11 +24,17 @@ public class AddPrescriptionCommandHandler(IAppDbContext dbContext,IMemoryCache 
             throw new NotFoundException("Appointment",request.PrescriptionRequest.AppointmentId.ToString());
         }
 
+        if (app.PatientId is null)
+        {
+            throw new ConflictException("Cannot add a prescription for an appointment with no assigned patient.");
+        }
+
         var req = request.PrescriptionRequest;
-        
+        var patientId = app.PatientId.Value;
+
         Prescription prs = request.PrescriptionRequest.Adapt<Prescription>();
         prs.AppointmentId = app.Id;
-        prs.PatientId = app.PatientId;
+        prs.PatientId = patientId;
         prs.DoctorId = app.DoctorId;
 
         await dbContext.Prescriptions.AddAsync(prs);
@@ -40,14 +46,14 @@ public class AddPrescriptionCommandHandler(IAppDbContext dbContext,IMemoryCache 
                 Instructions=req.Instructions,
                 Frequency=req.Frequency,
                 Name=req.MedicineName,
-                PatientId=app.PatientId,
+                PatientId=patientId,
                 PrescriptionId=prs.Id
             });
 
 
         if (!string.IsNullOrEmpty(req.TestName))
             await labResultService.CreateAsync(new LabResult { Result=req.Result,TestName=req.TestName,
-                Unit=req.Unit,ReferenceRange=req.ReferenceRange,PatientId=app.PatientId,PrescriptionId=prs.Id});
+                Unit=req.Unit,ReferenceRange=req.ReferenceRange,PatientId=patientId,PrescriptionId=prs.Id});
 
 
         return prs.Adapt<PrescriptionResponse>();

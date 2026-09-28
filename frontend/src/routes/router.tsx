@@ -10,6 +10,7 @@ import RemoveDoctorPage from "../pages/admin/RemoveDoctorPage";
 import RegisterPatientPage from "../pages/admin/RegisterPatientPage";
 import TodayAppointmentsPage from "../pages/doctor/TodayAppointmentsPage";
 import AddAppointmentPage from "../pages/doctor/AddAppointmentPage";
+import GenerateSlotsPage from "../pages/doctor/GenerateSlotsPage";
 import AddPrescriptionPage from "../pages/doctor/AddPrescriptionPage";
 import DoctorProfilePage from "../pages/doctor/ProfilePage";
 import SearchDoctorsPage from "../pages/patient/SearchDoctorsPage";
@@ -24,6 +25,7 @@ import {
   PillIcon,
   ProfileIcon,
   RecordsIcon,
+  RepeatIcon,
   SearchIcon,
   UserEditIcon,
   UserMinusIcon,
@@ -41,6 +43,7 @@ const adminNavItems = [
 const doctorNavItems = [
   { to: "/doctor", label: "Today's Appointments", icon: CalendarIcon },
   { to: "/doctor/appointments/add", label: "Add Appointment", icon: CalendarPlusIcon },
+  { to: "/doctor/appointments/generate", label: "Generate Slots", icon: RepeatIcon },
   { to: "/doctor/prescriptions/add", label: "Add Prescription", icon: PillIcon },
   { to: "/doctor/profile", label: "Profile", icon: ProfileIcon },
 ];
@@ -81,6 +84,7 @@ export const router = createBrowserRouter([
         children: [
           { index: true, element: <TodayAppointmentsPage /> },
           { path: "appointments/add", element: <AddAppointmentPage /> },
+          { path: "appointments/generate", element: <GenerateSlotsPage /> },
           { path: "prescriptions/add", element: <AddPrescriptionPage /> },
           { path: "profile", element: <DoctorProfilePage /> },
         ],
