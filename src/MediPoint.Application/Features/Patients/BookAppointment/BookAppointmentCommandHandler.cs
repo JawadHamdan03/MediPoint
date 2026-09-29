@@ -1,9 +1,10 @@
-﻿using MediatR;
+﻿using Mapster;
+using MediatR;
 using MediPoint.Application.Common;
 using MediPoint.Application.Common.Exceptions;
 using MediPoint.Application.Common.Services;
+using MediPoint.Application.Features.Patients.DTOs;
 using MediPoint.Domain.Common.Exceptions;
-using MediPoint.Domain.Entities.Apointments;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -12,9 +13,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MediPoint.Application.Features.Patients.BookAppointment;
 
-public class BookAppointmentCommandHandler(IAppDbContext dbContext,ILogger<BookAppointmentCommandHandler>logger,IMailer mailer) : IRequestHandler<BookAppointmentCommand, Appointment>
+public class BookAppointmentCommandHandler(IAppDbContext dbContext,ILogger<BookAppointmentCommandHandler>logger,IMailer mailer) : IRequestHandler<BookAppointmentCommand, AppointmentDTO>
 {
-    public async Task<Appointment> Handle(BookAppointmentCommand request, CancellationToken cancellationToken)
+    public async Task<AppointmentDTO> Handle(BookAppointmentCommand request, CancellationToken cancellationToken)
     {
         var appointment = await dbContext.Appointments.Include(a=>a.Doctor)
             .FirstOrDefaultAsync(a=>a.Id==request.Request.AppointmentId);
@@ -45,6 +46,6 @@ public class BookAppointmentCommandHandler(IAppDbContext dbContext,ILogger<BookA
                 $"Hi {patient.FirstName}, your appointment with Dr. {appointment.Doctor.FirstName} {appointment.Doctor.LastName} on {appointment.AppointmentDate:f} is confirmed.");
         }
 
-        return appointment;
+        return appointment.Adapt<AppointmentDTO>();
     }
 }

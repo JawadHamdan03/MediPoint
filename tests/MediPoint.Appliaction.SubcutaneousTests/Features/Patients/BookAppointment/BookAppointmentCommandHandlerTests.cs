@@ -7,6 +7,7 @@ using MediPoint.Domain.Entities.Apointments;
 using MediPoint.Domain.Entities.User;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
+using System.Text.Json;
 
 namespace MediPoint.Appliaction.SubcutaneousTests.Features.Patients.BookAppointment;
 
@@ -31,6 +32,12 @@ public class BookAppointmentCommandHandlerTests
             CancellationToken.None);
 
         Assert.Equal(patient.Id, result.PatientId);
+
+        // Regression guard: the controller returns this value straight to Ok(), so it must be
+        // a plain serializable DTO, not a tracked entity with back-reference navigations (which
+        // previously caused a JSON cycle exception after the DB write and email had already succeeded).
+        var json = JsonSerializer.Serialize(result);
+        Assert.Contains(patient.Id.ToString(), json);
     }
 
     [Fact]
