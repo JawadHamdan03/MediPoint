@@ -22,3 +22,12 @@ export interface LabResult {
   unit: string;
   referenceRange: string;
 }
+
+export interface NotificationResponse {
+  id: string;
+  title: string;
+  message: string;
+  type: string;
+  isRead: boolean;
+  createdAt: string;
+}

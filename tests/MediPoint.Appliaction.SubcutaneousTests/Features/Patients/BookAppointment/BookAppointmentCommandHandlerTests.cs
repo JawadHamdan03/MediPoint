@@ -5,6 +5,7 @@ using MediPoint.Application.Features.Patients.DTOs;
 using MediPoint.Common;
 using MediPoint.Domain.Entities.Apointments;
 using MediPoint.Domain.Entities.User;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
 using System.Text.Json;
@@ -38,6 +39,9 @@ public class BookAppointmentCommandHandlerTests
         // previously caused a JSON cycle exception after the DB write and email had already succeeded).
         var json = JsonSerializer.Serialize(result);
         Assert.Contains(patient.Id.ToString(), json);
+
+        Assert.Equal(1, await dbContext.PatientNotifications.CountAsync(n => n.PatientId == patient.Id));
+        Assert.Equal(1, await dbContext.DoctorNotifications.CountAsync(n => n.DoctorId == doctor.Id));
     }
 
     [Fact]

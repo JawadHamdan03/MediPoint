@@ -5,6 +5,7 @@ using MediPoint.Application.Common.Exceptions;
 using MediPoint.Application.Common.Services;
 using MediPoint.Application.Features.Patients.DTOs;
 using MediPoint.Domain.Common.Exceptions;
+using MediPoint.Domain.Entities.Notifications;
 using Microsoft.EntityFrameworkCore;
 
 namespace MediPoint.Application.Features.Patients.CancelAppointment;
@@ -32,6 +33,15 @@ public class CancelAppointmentCommandHandler(IAppDbContext dbContext,IMailer mai
 
         await mailer.SendEmailAsync(appointment.Doctor.Email, "Appointment Cancelled",
             $"Hi Dr. {appointment.Doctor.FirstName}, your appointment on {appointment.AppointmentDate:f} was cancelled by the patient.");
+
+        await dbContext.DoctorNotifications.AddAsync(new DoctorNotification
+        {
+            DoctorId = appointment.DoctorId,
+            Title = "Appointment Cancelled",
+            Message = $"Your appointment on {appointment.AppointmentDate:f} was cancelled by the patient.",
+            Type = NotificationTypes.AppointmentCancelled,
+        }, cancellationToken);
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         return appointment.Adapt<AppointmentDTO>();
     }

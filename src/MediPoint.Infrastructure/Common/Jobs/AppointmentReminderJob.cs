@@ -1,5 +1,7 @@
+using MediPoint.Application.Common;
 using MediPoint.Application.Common.Services;
 using MediPoint.Domain.Entities.Appointments.Enums;
+using MediPoint.Domain.Entities.Notifications;
 using MediPoint.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -45,7 +47,17 @@ public class AppointmentReminderJob(IServiceScopeFactory _scopeFactory,IMailer m
 
                   await mailer.SendEmailAsync(appointment.Patient.Email, "Appointment Reminder",
                      $"Hi {appointment.Patient.FirstName}, this is a reminder that you have an appointment with Dr. {appointment.Doctor.FirstName} {appointment.Doctor.LastName} on {appointment.AppointmentDate:f}.");
+
+                  await dbContext.PatientNotifications.AddAsync(new PatientNotification
+                  {
+                     PatientId = appointment.Patient.Id,
+                     Title = "Upcoming Appointment",
+                     Message = $"You have an appointment with Dr. {appointment.Doctor.FirstName} {appointment.Doctor.LastName} on {appointment.AppointmentDate:f}.",
+                     Type = NotificationTypes.AppointmentReminder,
+                  }, stoppingToken);
                }
+
+               await dbContext.SaveChangesAsync(stoppingToken);
             }
 
             await Task.Delay(CheckInterval, stoppingToken);

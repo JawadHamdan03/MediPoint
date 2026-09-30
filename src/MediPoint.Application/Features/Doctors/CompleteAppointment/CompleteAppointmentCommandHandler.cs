@@ -5,6 +5,7 @@ using MediPoint.Application.Common.Exceptions;
 using MediPoint.Application.Common.Services;
 using MediPoint.Application.Features.Doctors.AppointmentsQuery.DTOs;
 using MediPoint.Domain.Common.Exceptions;
+using MediPoint.Domain.Entities.Notifications;
 using Microsoft.EntityFrameworkCore;
 
 namespace MediPoint.Application.Features.Doctors.CompleteAppointment;
@@ -34,6 +35,15 @@ public class CompleteAppointmentCommandHandler(IAppDbContext dbContext,IMailer m
         {
             await mailer.SendEmailAsync(patient.Email, "Appointment Completed",
                 $"Hi {patient.FirstName}, your appointment on {appointment.AppointmentDate:f} has been marked as completed.");
+
+            await dbContext.PatientNotifications.AddAsync(new PatientNotification
+            {
+                PatientId = patient.Id,
+                Title = "Appointment Completed",
+                Message = $"Your appointment on {appointment.AppointmentDate:f} has been marked as completed.",
+                Type = NotificationTypes.AppointmentCompleted,
+            }, cancellationToken);
+            await dbContext.SaveChangesAsync(cancellationToken);
         }
 
         return appointment.Adapt<AppointmentResponse>();

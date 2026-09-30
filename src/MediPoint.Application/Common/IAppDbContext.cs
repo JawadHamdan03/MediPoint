@@ -1,4 +1,5 @@
 using MediPoint.Domain.Entities.Apointments;
+using MediPoint.Domain.Entities.Notifications;
 using MediPoint.Domain.Entities.PasswordReset;
 using MediPoint.Domain.Entities.Prescriptions;
 using MediPoint.Domain.Entities.RefreshToken;
@@ -23,6 +24,9 @@ public interface IAppDbContext
     public DbSet<AdminPasswordResetToken> AdminPasswordResetTokens { get; set; }
     public DbSet<PatientPasswordResetToken> PatientPasswordResetTokens { get; set; }
     public DbSet<DoctorPasswordResetToken> DoctorPasswordResetTokens { get; set; }
+    public DbSet<AdminNotification> AdminNotifications { get; set; }
+    public DbSet<PatientNotification> PatientNotifications { get; set; }
+    public DbSet<DoctorNotification> DoctorNotifications { get; set; }
 
 
 

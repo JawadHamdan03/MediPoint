@@ -5,6 +5,7 @@ using MediPoint.Application.Common.Exceptions;
 using MediPoint.Application.Common.Services;
 using MediPoint.Application.Features.Patients.DTOs;
 using MediPoint.Domain.Common.Exceptions;
+using MediPoint.Domain.Entities.Notifications;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -44,7 +45,24 @@ public class BookAppointmentCommandHandler(IAppDbContext dbContext,ILogger<BookA
         {
             await mailer.SendEmailAsync(patient.Email, "Appointment Confirmed",
                 $"Hi {patient.FirstName}, your appointment with Dr. {appointment.Doctor.FirstName} {appointment.Doctor.LastName} on {appointment.AppointmentDate:f} is confirmed.");
+
+            await dbContext.PatientNotifications.AddAsync(new PatientNotification
+            {
+                PatientId = patient.Id,
+                Title = "Appointment Confirmed",
+                Message = $"Your appointment with Dr. {appointment.Doctor.FirstName} {appointment.Doctor.LastName} on {appointment.AppointmentDate:f} is confirmed.",
+                Type = NotificationTypes.AppointmentConfirmed,
+            }, cancellationToken);
         }
+
+        await dbContext.DoctorNotifications.AddAsync(new DoctorNotification
+        {
+            DoctorId = appointment.DoctorId,
+            Title = "New Appointment Booked",
+            Message = $"A patient booked your {appointment.AppointmentDate:f} slot.",
+            Type = NotificationTypes.AppointmentBooked,
+        }, cancellationToken);
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         return appointment.Adapt<AppointmentDTO>();
     }

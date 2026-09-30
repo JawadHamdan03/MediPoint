@@ -4,6 +4,7 @@ import { useAuth } from "../../context/AuthContext";
 import { Button } from "../ui/Button";
 import { Avatar } from "../ui/Avatar";
 import { ThemeToggle } from "../ui/ThemeToggle";
+import { NotificationBell } from "../ui/NotificationBell";
 import { LogoutIcon } from "../ui/icons";
 
 export interface NavItem {
@@ -88,6 +89,7 @@ export function AppShell({ navItems, title }: { navItems: NavItem[]; title: stri
             <h1 className="text-lg font-semibold text-(--text-h)">{title}</h1>
           </div>
           <div className="flex items-center gap-3">
+            <NotificationBell />
             <ThemeToggle className="md:hidden" />
             <span className={`hidden rounded-full px-2.5 py-1 text-xs font-medium sm:inline-block ${roleBadgeClasses[auth.role ?? ""] ?? ""}`}>
               {auth.role}

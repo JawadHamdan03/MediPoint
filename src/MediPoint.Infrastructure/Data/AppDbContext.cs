@@ -1,6 +1,7 @@
 ﻿using MediPoint.Application.Common;
 using MediPoint.Domain.Entities.Apointments;
 using MediPoint.Domain.Entities.MedicalRecords;
+using MediPoint.Domain.Entities.Notifications;
 using MediPoint.Domain.Entities.PasswordReset;
 using MediPoint.Domain.Entities.Prescriptions;
 using MediPoint.Domain.Entities.Prescriptions.LabRes;
@@ -29,6 +30,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<AdminPasswordResetToken> AdminPasswordResetTokens { get; set; }
     public DbSet<PatientPasswordResetToken> PatientPasswordResetTokens { get; set; }
     public DbSet<DoctorPasswordResetToken> DoctorPasswordResetTokens { get; set; }
+    public DbSet<AdminNotification> AdminNotifications { get; set; }
+    public DbSet<PatientNotification> PatientNotifications { get; set; }
+    public DbSet<DoctorNotification> DoctorNotifications { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
