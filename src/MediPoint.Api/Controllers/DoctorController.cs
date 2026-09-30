@@ -15,6 +15,8 @@ using MediPoint.Application.Features.Doctors.SignUp;
 using MediPoint.Application.Features.Doctors.SignUp.DTOs;
 using MediPoint.Application.Features.Doctors.GenerateAppointmentSlots;
 using MediPoint.Application.Features.Doctors.GenerateAppointmentSlots.DTOs;
+using MediPoint.Application.Features.Doctors.ForgotPassword;
+using MediPoint.Application.Features.Doctors.ResetPassword;
 
 namespace MediPoint.Api.Controllers;
 
@@ -40,6 +42,20 @@ public class DoctorController(IMediator mediator) : ControllerBase
 
     }
 
+
+    [HttpPost("forgot-password")]
+    public async Task<IActionResult> forgotPassword(ForgotPasswordRequest request)
+    {
+        var res = await mediator.Send(new DoctorForgotPasswordCommand(request));
+        return Ok(res);
+    }
+
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> resetPassword(ResetPasswordRequest request)
+    {
+        var res = await mediator.Send(new DoctorResetPasswordCommand(request));
+        return Ok(res);
+    }
 
     [HttpPost("refreshToken")]
     public async Task<IActionResult> reffreshToken([FromBody] string refreshToken)

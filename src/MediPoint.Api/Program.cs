@@ -34,6 +34,9 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 
 builder.Services.AddScoped<IJwtTokenServiceProvider, JwtTokenServiceProvider>();
 
+builder.Services.Configure<FrontendSettings>(builder.Configuration.GetSection("Frontend"));
+builder.Services.AddTransient<IAppUrlProvider, AppUrlProvider>();
+
 builder.Services.AddOpenAiChatClient(builder.Configuration);
 builder.Services.AddOpenApi();
 builder.Services.AddHttpContextAccessor();

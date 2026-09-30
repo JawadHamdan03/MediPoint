@@ -84,14 +84,19 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
-            <Input
-              label="Password"
-              type="password"
-              autoComplete="current-password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
+            <div className="flex flex-col gap-1.5">
+              <Input
+                label="Password"
+                type="password"
+                autoComplete="current-password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <Link to="/forgot-password" className="self-end text-xs font-medium text-(--accent)">
+                Forgot password?
+              </Link>
+            </div>
 
             {errors.length > 0 && <ErrorList errors={errors} />}
 

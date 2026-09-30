@@ -47,6 +47,7 @@ services:
       MediPoint__LabResultsCollectionName: "LabResults"
       MediPoint__MedicineCollectionName: "Medicine"
       ConnectionStrings__DefaultConnection: ${SQLSERVER_CONNECTION_STRING:-Server=sqlserver,1433;Database=MediPoint;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True;}
+      Frontend__BaseUrl: ${FRONTEND_BASE_URL:-http://localhost}
       JwtSettings__Issuer: "localhost"
       JwtSettings__Audience: "localhost"
       JwtSettings__TokenExpirationInMinutes: "200"

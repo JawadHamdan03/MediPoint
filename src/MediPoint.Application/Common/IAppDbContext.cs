@@ -1,4 +1,5 @@
 using MediPoint.Domain.Entities.Apointments;
+using MediPoint.Domain.Entities.PasswordReset;
 using MediPoint.Domain.Entities.Prescriptions;
 using MediPoint.Domain.Entities.RefreshToken;
 using MediPoint.Domain.Entities.User;
@@ -19,9 +20,12 @@ public interface IAppDbContext
     public DbSet<AdminRefreshToken> AdminRefreshTokens { get; set; }
     public DbSet<PatientRefreshToken> PatientRefreshTokens { get; set; }
     public DbSet<DoctorRefreshToken> DoctorRefreshTokens { get; set; }
+    public DbSet<AdminPasswordResetToken> AdminPasswordResetTokens { get; set; }
+    public DbSet<PatientPasswordResetToken> PatientPasswordResetTokens { get; set; }
+    public DbSet<DoctorPasswordResetToken> DoctorPasswordResetTokens { get; set; }
 
 
-   
+
 
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }

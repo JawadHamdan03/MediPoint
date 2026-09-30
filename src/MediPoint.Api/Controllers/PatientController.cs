@@ -16,6 +16,8 @@ using MediPoint.Application.Features.Patients.Chat;
 using MediPoint.Application.Features.Patients.Chat.DTOs;
 using MediPoint.Application.Features.Patients.SignUp;
 using MediPoint.Application.Features.Patients.SignUp.DTOs;
+using MediPoint.Application.Features.Patients.ForgotPassword;
+using MediPoint.Application.Features.Patients.ResetPassword;
 
 namespace MediPoint.Api.Controllers;
 
@@ -36,6 +38,20 @@ public class PatientController(IMediator mediator) : ControllerBase
     {
         var res = await mediator.Send(new PatientLoginCommand(loginRequest));
 
+        return Ok(res);
+    }
+
+    [HttpPost("forgot-password")]
+    public async Task<IActionResult> forgotPassword(ForgotPasswordRequest request)
+    {
+        var res = await mediator.Send(new PatientForgotPasswordCommand(request));
+        return Ok(res);
+    }
+
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> resetPassword(ResetPasswordRequest request)
+    {
+        var res = await mediator.Send(new PatientResetPasswordCommand(request));
         return Ok(res);
     }
 

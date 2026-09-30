@@ -1,9 +1,33 @@
 import { apiFetch } from "./client";
-import type { DoctorSignUpDto, JwtTokenResponse, LoginRequest, PatientSignUpDto, Role, SignUpRole } from "../types/auth";
+import type {
+  DoctorSignUpDto,
+  ForgotPasswordRequest,
+  JwtTokenResponse,
+  LoginRequest,
+  MessageResponse,
+  PatientSignUpDto,
+  ResetPasswordRequest,
+  Role,
+  SignUpRole,
+} from "../types/auth";
+
+const rolePathSegment: Record<Role, string> = {
+  Admin: "/api/Admin",
+  Doctor: "/api/Doctor",
+  Patient: "/patients",
+};
 
 export function login(role: Role, request: LoginRequest): Promise<JwtTokenResponse> {
   const path = role === "Admin" ? "/api/Admin/login" : role === "Doctor" ? "/api/Doctor/login" : "/patients/login";
   return apiFetch<JwtTokenResponse>(path, { method: "POST", body: request, auth: false });
+}
+
+export function forgotPassword(role: Role, request: ForgotPasswordRequest): Promise<MessageResponse> {
+  return apiFetch<MessageResponse>(`${rolePathSegment[role]}/forgot-password`, { method: "POST", body: request, auth: false });
+}
+
+export function resetPassword(role: Role, request: ResetPasswordRequest): Promise<MessageResponse> {
+  return apiFetch<MessageResponse>(`${rolePathSegment[role]}/reset-password`, { method: "POST", body: request, auth: false });
 }
 
 export function signUp(role: "Doctor", request: DoctorSignUpDto): Promise<JwtTokenResponse>;

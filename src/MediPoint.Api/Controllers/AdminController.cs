@@ -9,6 +9,8 @@ using MediPoint.Application.Features.Admins.RemoveDoctor;
 using MediPoint.Application.Features.Admins.RegisterPatient;
 using MediPoint.Application.Features.Admins.RegisterPatient.DTOs;
 using MediPoint.Application.Features.Patients.DTOs;
+using MediPoint.Application.Features.Admins.ForgotPassword;
+using MediPoint.Application.Features.Admins.ResetPassword;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,6 +24,20 @@ public class AdminController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> login(LoginRequest loginRequest)
     {
         var res = await mediator.Send(new AdminLoginCommand(loginRequest));
+        return Ok(res);
+    }
+
+    [HttpPost("forgot-password")]
+    public async Task<IActionResult> forgotPassword(ForgotPasswordRequest request)
+    {
+        var res = await mediator.Send(new AdminForgotPasswordCommand(request));
+        return Ok(res);
+    }
+
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> resetPassword(ResetPasswordRequest request)
+    {
+        var res = await mediator.Send(new AdminResetPasswordCommand(request));
         return Ok(res);
     }
 

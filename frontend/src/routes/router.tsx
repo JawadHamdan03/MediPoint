@@ -3,6 +3,8 @@ import { ProtectedRoute } from "./ProtectedRoute";
 import { AppShell } from "../components/layout/AppShell";
 import LoginPage from "../pages/auth/LoginPage";
 import SignUpPage from "../pages/auth/SignUpPage";
+import ForgotPasswordPage from "../pages/auth/ForgotPasswordPage";
+import ResetPasswordPage from "../pages/auth/ResetPasswordPage";
 import DashboardPage from "../pages/admin/DashboardPage";
 import AddDoctorPage from "../pages/admin/AddDoctorPage";
 import UpdateDoctorPage from "../pages/admin/UpdateDoctorPage";
@@ -59,6 +61,8 @@ export const router = createBrowserRouter([
   { path: "/", element: <Navigate to="/login" replace /> },
   { path: "/login", element: <LoginPage /> },
   { path: "/signup", element: <SignUpPage /> },
+  { path: "/forgot-password", element: <ForgotPasswordPage /> },
+  { path: "/reset-password", element: <ResetPasswordPage /> },
   {
     path: "/admin",
     element: <ProtectedRoute role="Admin" />,
