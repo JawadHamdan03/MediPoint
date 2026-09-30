@@ -6,6 +6,8 @@ namespace MediPoint.Application.Features.Patients.DTOs;
 
 public class DoctorResponse
 {
+    public Guid Id { get; set; }
+
     public string FirstName { get; set; } = null!;
 
     public string LastName { get; set; } = null!;
@@ -23,6 +25,10 @@ public class DoctorResponse
     public string Biography { get; set; } = "";
 
     public string? ImageUrl { get; set; }
+
+    public double? AverageRating { get; set; }
+
+    public int ReviewCount { get; set; }
 
     public List<AppointmentDTO> AppointmentDTOs { get; set; }
 }

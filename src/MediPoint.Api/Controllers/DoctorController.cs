@@ -17,6 +17,7 @@ using MediPoint.Application.Features.Doctors.GenerateAppointmentSlots;
 using MediPoint.Application.Features.Doctors.GenerateAppointmentSlots.DTOs;
 using MediPoint.Application.Features.Doctors.ForgotPassword;
 using MediPoint.Application.Features.Doctors.ResetPassword;
+using MediPoint.Application.Features.Patients.GetDoctorReviews;
 
 namespace MediPoint.Api.Controllers;
 
@@ -109,5 +110,13 @@ public class DoctorController(IMediator mediator) : ControllerBase
         return Ok(res);
     }
 
+    [Authorize(Roles = "Doctor")]
+    [HttpGet("reviews")]
+    public async Task<IActionResult> GetMyReviews()
+    {
+        var docId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var res = await mediator.Send(new GetDoctorReviewsQuery(Guid.Parse(docId!)));
+        return Ok(res);
+    }
 
 }

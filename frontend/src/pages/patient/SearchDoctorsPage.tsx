@@ -10,6 +10,7 @@ import { Card } from "../../components/ui/Card";
 import { Badge } from "../../components/ui/Badge";
 import { Skeleton } from "../../components/ui/Skeleton";
 import { Avatar } from "../../components/ui/Avatar";
+import { StarRating } from "../../components/ui/StarRating";
 import { PageHeader } from "../../components/ui/PageHeader";
 import { CalendarIcon, SearchIcon } from "../../components/ui/icons";
 import { ErrorList } from "../../components/ui/ErrorList";
@@ -149,6 +150,18 @@ export default function SearchDoctorsPage() {
                     <p className="text-sm text-(--text)">
                       {d.specialty} · {d.yearsOfExperience} yrs experience · ${d.consultationFee} consultation
                     </p>
+                    <div className="mt-1 flex items-center gap-1.5">
+                      {d.reviewCount > 0 ? (
+                        <>
+                          <StarRating value={Math.round(d.averageRating ?? 0)} />
+                          <span className="text-xs text-(--text)">
+                            {d.averageRating?.toFixed(1)} ({d.reviewCount} review{d.reviewCount === 1 ? "" : "s"})
+                          </span>
+                        </>
+                      ) : (
+                        <span className="text-xs text-(--text)">No reviews yet</span>
+                      )}
+                    </div>
                     {d.biography && <p className="mt-2 text-sm text-(--text)">{d.biography}</p>}
                   </div>
                 </div>

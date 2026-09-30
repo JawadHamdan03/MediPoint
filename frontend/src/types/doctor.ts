@@ -60,3 +60,11 @@ export interface GenerateAppointmentSlotsResult {
   skipped: number;
   slots: ApponitmentDTO[];
 }
+
+export interface ReviewResponse {
+  id: string;
+  rating: number;
+  comment: string | null;
+  createdAt: string;
+  patientName: string;
+}

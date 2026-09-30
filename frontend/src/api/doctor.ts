@@ -7,6 +7,7 @@ import type {
   GenerateAppointmentSlotsResult,
   PrescriptionRequest,
   PrescriptionResponse,
+  ReviewResponse,
 } from "../types/doctor";
 
 export function getTodaysAppointments(): Promise<AppointmentResponse[]> {
@@ -27,6 +28,10 @@ export function generateAppointmentSlots(
   request: GenerateAppointmentSlotsRequest,
 ): Promise<GenerateAppointmentSlotsResult> {
   return apiFetch<GenerateAppointmentSlotsResult>("/api/Doctor/generate-slots", { method: "POST", body: request });
+}
+
+export function getMyReviews(): Promise<ReviewResponse[]> {
+  return apiFetch<ReviewResponse[]>("/api/Doctor/reviews");
 }
 
 export function completeAppointment(

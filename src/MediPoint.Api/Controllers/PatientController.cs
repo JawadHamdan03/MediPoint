@@ -18,6 +18,10 @@ using MediPoint.Application.Features.Patients.SignUp;
 using MediPoint.Application.Features.Patients.SignUp.DTOs;
 using MediPoint.Application.Features.Patients.ForgotPassword;
 using MediPoint.Application.Features.Patients.ResetPassword;
+using MediPoint.Application.Features.Patients.AddReview;
+using MediPoint.Application.Features.Patients.AddReview.DTOs;
+using MediPoint.Application.Features.Patients.GetDoctorReviews;
+using MediPoint.Application.Features.Patients.GetMyAppointments;
 
 namespace MediPoint.Api.Controllers;
 
@@ -109,6 +113,32 @@ public class PatientController(IMediator mediator) : ControllerBase
     {
         var patientId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         var res = await mediator.Send(new UpdatePatientDetailsCommand(Guid.Parse(patientId!), details));
+        return Ok(res);
+    }
+
+    [Authorize(Roles = "Patient")]
+    [HttpGet("appointments")]
+    public async Task<IActionResult> GetMyAppointments()
+    {
+        var patientId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var res = await mediator.Send(new GetMyAppointmentsQuery(Guid.Parse(patientId!)));
+        return Ok(res);
+    }
+
+    [Authorize(Roles = "Patient")]
+    [HttpPost("appointments/{appointmentId}/review")]
+    public async Task<IActionResult> AddReview(Guid appointmentId, AddReviewRequest request)
+    {
+        var patientId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var res = await mediator.Send(new AddReviewCommand(appointmentId, Guid.Parse(patientId!), request));
+        return Ok(res);
+    }
+
+    [Authorize(Roles = "Patient")]
+    [HttpGet("doctors/{doctorId}/reviews")]
+    public async Task<IActionResult> GetDoctorReviews(Guid doctorId)
+    {
+        var res = await mediator.Send(new GetDoctorReviewsQuery(doctorId));
         return Ok(res);
     }
 

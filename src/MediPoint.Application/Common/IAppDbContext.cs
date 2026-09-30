@@ -3,6 +3,7 @@ using MediPoint.Domain.Entities.Notifications;
 using MediPoint.Domain.Entities.PasswordReset;
 using MediPoint.Domain.Entities.Prescriptions;
 using MediPoint.Domain.Entities.RefreshToken;
+using MediPoint.Domain.Entities.Reviews;
 using MediPoint.Domain.Entities.User;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -18,6 +19,7 @@ public interface IAppDbContext
     public DbSet<Patient> Patients { get; set; }
     public DbSet<Appointment> Appointments { get; set; }
     public DbSet<Prescription> Prescriptions { get; set; }
+    public DbSet<Review> Reviews { get; set; }
     public DbSet<AdminRefreshToken> AdminRefreshTokens { get; set; }
     public DbSet<PatientRefreshToken> PatientRefreshTokens { get; set; }
     public DbSet<DoctorRefreshToken> DoctorRefreshTokens { get; set; }

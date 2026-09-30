@@ -131,6 +131,14 @@ export function ProfileIcon(props: IconProps) {
   );
 }
 
+export function StarIcon(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <path d="m12 3 2.7 5.7 6.3.9-4.6 4.4 1.1 6.3-5.5-3-5.5 3 1.1-6.3L2.5 9.6l6.3-.9Z" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 export function BellIcon(props: IconProps) {
   return (
     <svg {...base(props)}>

@@ -19,6 +19,26 @@ public class FindDoctorsQueryHandler(IAppDbContext dbContext,ILogger<FindDoctors
 {
     public async Task<List<DoctorResponse>> Handle(FindDoctorsQuery request, CancellationToken cancellationToken)
     {
+        async Task AttachRatingsAsync(List<DoctorResponse> list)
+        {
+            var doctorIds = list.Select(d => d.Id).ToList();
+            var ratings = await dbContext.Reviews.AsNoTracking()
+                .Where(r => doctorIds.Contains(r.DoctorId))
+                .GroupBy(r => r.DoctorId)
+                .Select(g => new { DoctorId = g.Key, Average = g.Average(r => r.Rating), Count = g.Count() })
+                .ToListAsync(cancellationToken);
+
+            foreach (var doc in list)
+            {
+                var rating = ratings.FirstOrDefault(r => r.DoctorId == doc.Id);
+                if (rating is not null)
+                {
+                    doc.AverageRating = Math.Round(rating.Average, 1);
+                    doc.ReviewCount = rating.Count;
+                }
+            }
+        }
+
         string doctorsBySpecialityCacheKey = $"doctors-spec-{request.speciality}";
         List<Doctor>? doctors;
         if (memoryCache.TryGetValue(doctorsBySpecialityCacheKey,out doctors ))
@@ -33,6 +53,7 @@ public class FindDoctorsQueryHandler(IAppDbContext dbContext,ILogger<FindDoctors
                 cacheRes.Add(adaptedDoc);
             }
 
+            await AttachRatingsAsync(cacheRes);
             return cacheRes;
         }
 
@@ -60,6 +81,7 @@ public class FindDoctorsQueryHandler(IAppDbContext dbContext,ILogger<FindDoctors
             res.Add(adaptedDoc);
         }
 
+        await AttachRatingsAsync(res);
         logger.LogInformation("Doctors with {Speciality} Speciality found",request.speciality);
         return res;
     }

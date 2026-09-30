@@ -1,6 +1,7 @@
 ﻿using MediPoint.Domain.Entities.Apointments;
 using MediPoint.Domain.Entities.Prescriptions;
 using MediPoint.Domain.Entities.RefreshToken;
+using MediPoint.Domain.Entities.Reviews;
 using MediPoint.Domain.Entities.User.Shared;
 using System;
 using System.Collections.Generic;
@@ -21,6 +22,7 @@ public class Patient : BaseUser
 
     public List<Appointment> Appointments { get; set; }= new List<Appointment>();
     public List<Prescription> Prescriptions { get; set; } = new List<Prescription>();
+    public List<Review> Reviews { get; set; } = new List<Review>();
 
     public List<PatientRefreshToken> PatientRefreshTokens { get; set; }
 }

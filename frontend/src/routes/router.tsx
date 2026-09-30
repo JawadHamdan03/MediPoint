@@ -16,9 +16,11 @@ import GenerateSlotsPage from "../pages/doctor/GenerateSlotsPage";
 import AddPrescriptionPage from "../pages/doctor/AddPrescriptionPage";
 import DoctorProfilePage from "../pages/doctor/ProfilePage";
 import SearchDoctorsPage from "../pages/patient/SearchDoctorsPage";
+import MyAppointmentsPage from "../pages/patient/MyAppointmentsPage";
 import MedicalRecordsPage from "../pages/patient/MedicalRecordsPage";
 import ChatPage from "../pages/patient/ChatPage";
 import ProfilePage from "../pages/patient/ProfilePage";
+import DoctorReviewsPage from "../pages/doctor/ReviewsPage";
 import {
   CalendarIcon,
   CalendarPlusIcon,
@@ -29,6 +31,7 @@ import {
   RecordsIcon,
   RepeatIcon,
   SearchIcon,
+  StarIcon,
   UserEditIcon,
   UserMinusIcon,
   UserPlusIcon,
@@ -47,11 +50,13 @@ const doctorNavItems = [
   { to: "/doctor/appointments/add", label: "Add Appointment", icon: CalendarPlusIcon },
   { to: "/doctor/appointments/generate", label: "Generate Slots", icon: RepeatIcon },
   { to: "/doctor/prescriptions/add", label: "Add Prescription", icon: PillIcon },
+  { to: "/doctor/reviews", label: "My Reviews", icon: StarIcon },
   { to: "/doctor/profile", label: "Profile", icon: ProfileIcon },
 ];
 
 const patientNavItems = [
   { to: "/patient", label: "Search Doctors", icon: SearchIcon },
+  { to: "/patient/appointments", label: "My Appointments", icon: CalendarIcon },
   { to: "/patient/medical-records", label: "Medical Records", icon: RecordsIcon },
   { to: "/patient/chat", label: "Chat", icon: ChatIcon },
   { to: "/patient/profile", label: "Profile", icon: ProfileIcon },
@@ -90,6 +95,7 @@ export const router = createBrowserRouter([
           { path: "appointments/add", element: <AddAppointmentPage /> },
           { path: "appointments/generate", element: <GenerateSlotsPage /> },
           { path: "prescriptions/add", element: <AddPrescriptionPage /> },
+          { path: "reviews", element: <DoctorReviewsPage /> },
           { path: "profile", element: <DoctorProfilePage /> },
         ],
       },
@@ -103,6 +109,7 @@ export const router = createBrowserRouter([
         element: <AppShell navItems={patientNavItems} title="Patient" />,
         children: [
           { index: true, element: <SearchDoctorsPage /> },
+          { path: "appointments", element: <MyAppointmentsPage /> },
           { path: "medical-records", element: <MedicalRecordsPage /> },
           { path: "chat", element: <ChatPage /> },
           { path: "profile", element: <ProfilePage /> },

@@ -8,6 +8,7 @@ export interface AppointmentDTO {
 }
 
 export interface DoctorResponse {
+  id: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -18,7 +19,35 @@ export interface DoctorResponse {
   consultationFee: number;
   biography: string;
   imageUrl?: string | null;
+  averageRating: number | null;
+  reviewCount: number;
   appointmentDTOs: AppointmentDTO[];
+}
+
+export interface ReviewResponse {
+  id: string;
+  rating: number;
+  comment: string | null;
+  createdAt: string;
+  patientName: string;
+}
+
+export interface MyAppointmentResponse {
+  id: string;
+  appointmentDate: string;
+  duration: number;
+  status: AppointmentStatus;
+  reason: string | null;
+  notes: string | null;
+  cancellationReason: string | null;
+  doctorId: string;
+  doctorName: string;
+  hasReview: boolean;
+}
+
+export interface AddReviewRequest {
+  rating: number;
+  comment?: string | null;
 }
 
 export interface MedicalRecordResponse {

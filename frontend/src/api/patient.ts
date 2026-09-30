@@ -1,10 +1,13 @@
 import { apiFetch } from "./client";
 import type {
+  AddReviewRequest,
   CancelAppointmentRequest,
   ChatRequest,
   ChatResult,
   DoctorResponse,
   MedicalRecordResponse,
+  MyAppointmentResponse,
+  ReviewResponse,
   UpdatePatientDto,
 } from "../types/patient";
 import type { AppointmentResponse } from "../types/doctor";
@@ -34,4 +37,16 @@ export function updateDetails(details: UpdatePatientDto): Promise<UpdatePatientD
 
 export function chat(request: ChatRequest): Promise<ChatResult> {
   return apiFetch<ChatResult>("/patients/chat", { method: "POST", body: request });
+}
+
+export function getMyAppointments(): Promise<MyAppointmentResponse[]> {
+  return apiFetch<MyAppointmentResponse[]>("/patients/appointments");
+}
+
+export function addReview(appointmentId: string, request: AddReviewRequest): Promise<ReviewResponse> {
+  return apiFetch<ReviewResponse>(`/patients/appointments/${appointmentId}/review`, { method: "POST", body: request });
+}
+
+export function getDoctorReviews(doctorId: string): Promise<ReviewResponse[]> {
+  return apiFetch<ReviewResponse[]>(`/patients/doctors/${doctorId}/reviews`);
 }

@@ -2,6 +2,7 @@ using MediPoint.Domain.Common;
 using MediPoint.Domain.Common.Exceptions;
 using MediPoint.Domain.Entities.Appointments.Enums;
 using MediPoint.Domain.Entities.Prescriptions;
+using MediPoint.Domain.Entities.Reviews;
 using MediPoint.Domain.Entities.User;
 using System;
 using System.Collections.Generic;
@@ -32,6 +33,8 @@ public class Appointment : BaseEntity
     public Doctor Doctor { get; set; }
 
     public Prescription? Prescription { get; set; }
+
+    public Review? Review { get; set; }
 
     public static Appointment Create(Guid doctorId, DateTime appointmentDate, int duration, string? reason = null)
     {
