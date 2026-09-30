@@ -1,5 +1,5 @@
 import { apiFetch } from "./client";
-import type { DoctorDto, PatientDto, UpdateDoctorDto } from "../types/admin";
+import type { AdminDashboardResponse, DoctorDto, PatientDto, UpdateDoctorDto } from "../types/admin";
 
 export function addDoctor(doctor: DoctorDto): Promise<DoctorDto> {
   return apiFetch<DoctorDto>("/api/Admin/Add-doctor", { method: "POST", body: doctor });
@@ -15,4 +15,8 @@ export function removeDoctor(doctorId: string): Promise<DoctorDto> {
 
 export function registerPatient(patient: PatientDto): Promise<PatientDto> {
   return apiFetch<PatientDto>("/api/Admin/register-patient", { method: "POST", body: patient });
+}
+
+export function getDashboard(): Promise<AdminDashboardResponse> {
+  return apiFetch<AdminDashboardResponse>("/api/Admin/dashboard");
 }

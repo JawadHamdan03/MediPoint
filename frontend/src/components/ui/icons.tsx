@@ -174,6 +174,24 @@ export function CheckIcon(props: IconProps) {
   );
 }
 
+export function DollarIcon(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <path d="M12 3v18" />
+      <path d="M16.5 7.5c0-1.7-2-3-4.5-3s-4.5 1.1-4.5 2.75S9 10 12 10.5s4.5 1.5 4.5 3.25S14.5 16.5 12 16.5s-4.5-1.3-4.5-3" />
+    </svg>
+  );
+}
+
+export function XCircleIcon(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="m9 9 6 6M15 9l-6 6" />
+    </svg>
+  );
+}
+
 export function SendIcon(props: IconProps) {
   return (
     <svg {...base(props)}>

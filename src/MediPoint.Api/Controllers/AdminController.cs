@@ -11,6 +11,7 @@ using MediPoint.Application.Features.Admins.RegisterPatient.DTOs;
 using MediPoint.Application.Features.Patients.DTOs;
 using MediPoint.Application.Features.Admins.ForgotPassword;
 using MediPoint.Application.Features.Admins.ResetPassword;
+using MediPoint.Application.Features.Admins.GetDashboard;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -80,6 +81,13 @@ public class AdminController(IMediator mediator) : ControllerBase
         var res = await mediator.Send(new RegisterPatientCommand(patient));
         return Ok(res);
     }
-    
-    
+
+    [Authorize(Roles = "Admin")]
+    [HttpGet("dashboard")]
+    public async Task<IActionResult> GetDashboard()
+    {
+        var res = await mediator.Send(new GetDashboardQuery());
+        return Ok(res);
+    }
+
 }

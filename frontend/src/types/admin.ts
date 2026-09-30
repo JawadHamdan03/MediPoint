@@ -43,3 +43,40 @@ export interface PatientDto {
   emergencyContactName: string;
   emergencyContactPhone: string;
 }
+
+export interface SpecialtyRevenue {
+  specialty: string;
+  revenue: number;
+  completedAppointments: number;
+}
+
+export interface DailyAppointmentCount {
+  date: string; // yyyy-MM-dd
+  count: number;
+}
+
+export interface TopRatedDoctor {
+  doctorId: string;
+  name: string;
+  specialty: string;
+  averageRating: number;
+  reviewCount: number;
+}
+
+export interface AdminDashboardResponse {
+  totalAppointments: number;
+  pendingCount: number;
+  confirmedCount: number;
+  completedCount: number;
+  cancelledCount: number;
+  missedCount: number;
+  cancellationRate: number;
+  completionRate: number;
+  totalDoctors: number;
+  activeDoctors: number;
+  totalPatients: number;
+  totalRevenue: number;
+  revenueBySpecialty: SpecialtyRevenue[];
+  appointmentsLast30Days: DailyAppointmentCount[];
+  topRatedDoctors: TopRatedDoctor[];
+}
