@@ -7,7 +7,7 @@ export interface AppointmentResponse {
   status: AppointmentStatus;
   reason?: string | null;
   notes?: string | null;
-  patientId: string;
+  patientId: string | null;
 }
 
 export interface PrescriptionRequest {

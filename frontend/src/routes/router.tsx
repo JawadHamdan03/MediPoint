@@ -46,7 +46,7 @@ const adminNavItems = [
 ];
 
 const doctorNavItems = [
-  { to: "/doctor", label: "Today's Appointments", icon: CalendarIcon },
+  { to: "/doctor", label: "Appointments", icon: CalendarIcon },
   { to: "/doctor/appointments/add", label: "Add Appointment", icon: CalendarPlusIcon },
   { to: "/doctor/appointments/generate", label: "Generate Slots", icon: RepeatIcon },
   { to: "/doctor/prescriptions/add", label: "Add Prescription", icon: PillIcon },

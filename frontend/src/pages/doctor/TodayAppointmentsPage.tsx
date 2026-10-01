@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { completeAppointment, getTodaysAppointments } from "../../api/doctor";
+import { completeAppointment, getAppointments } from "../../api/doctor";
 import type { AppointmentResponse } from "../../types/doctor";
 import { Table } from "../../components/ui/Table";
 import { TableSkeleton } from "../../components/ui/Skeleton";
 import { Badge } from "../../components/ui/Badge";
 import { Button } from "../../components/ui/Button";
+import { Input } from "../../components/ui/Input";
 import { Avatar } from "../../components/ui/Avatar";
 import { PageHeader } from "../../components/ui/PageHeader";
 import { CalendarIcon, CalendarPlusIcon, PillIcon, RefreshIcon } from "../../components/ui/icons";
@@ -74,12 +75,13 @@ export default function TodayAppointmentsPage() {
   const [appointments, setAppointments] = useState<AppointmentResponse[] | null>(null);
   const [errors, setErrors] = useState<string[]>([]);
   const [refreshing, setRefreshing] = useState(false);
+  const [dateFilter, setDateFilter] = useState("");
 
-  async function load(showSpinner = false) {
+  async function load(date: string, showSpinner = false) {
     setErrors([]);
     if (showSpinner) setRefreshing(true);
     try {
-      setAppointments(await getTodaysAppointments());
+      setAppointments(await getAppointments(date || undefined));
     } catch (err) {
       setErrors(formatError(err));
     } finally {
@@ -90,8 +92,13 @@ export default function TodayAppointmentsPage() {
   useEffect(() => {
     // Standard fetch-on-mount: load() resets error state before the request.
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    load();
+    load("");
   }, []);
+
+  function onDateChange(value: string) {
+    setDateFilter(value);
+    load(value, true);
+  }
 
   const pendingCount = appointments?.filter((a) => a.status === "Pending" || a.status === "Confirmed").length ?? 0;
 
@@ -99,11 +106,27 @@ export default function TodayAppointmentsPage() {
     <div className="flex flex-col gap-4">
       <PageHeader
         icon={CalendarIcon}
-        title="Today's Appointments"
-        description={appointments ? `${pendingCount} upcoming · ${appointments.length} total` : "Loading your schedule…"}
+        title="Appointments"
+        description={
+          appointments
+            ? `${pendingCount} upcoming · ${appointments.length} total${dateFilter ? " · filtered by date" : ""}`
+            : "Loading your schedule…"
+        }
         action={
-          <div className="flex gap-2">
-            <Button variant="secondary" onClick={() => load(true)} disabled={refreshing}>
+          <div className="flex items-end gap-2">
+            <Input
+              label="Filter by date"
+              type="date"
+              value={dateFilter}
+              onChange={(e) => onDateChange(e.target.value)}
+              className="py-1.5"
+            />
+            {dateFilter && (
+              <Button variant="secondary" onClick={() => onDateChange("")} disabled={refreshing}>
+                Clear
+              </Button>
+            )}
+            <Button variant="secondary" onClick={() => load(dateFilter, true)} disabled={refreshing}>
               <RefreshIcon className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
               Refresh
             </Button>
@@ -120,23 +143,27 @@ export default function TodayAppointmentsPage() {
       {errors.length > 0 && <ErrorList errors={errors} />}
 
       {appointments === null ? (
-        <TableSkeleton rows={5} cols={5} />
+        <TableSkeleton rows={5} cols={6} />
       ) : (
         <Table
           rows={appointments}
           rowKey={(a) => a.id}
-          emptyMessage="No appointments today."
+          emptyMessage={dateFilter ? "No appointments on this date." : "No appointments yet."}
           columns={[
+            { header: "Date", render: (a) => new Date(a.appointmentDate).toLocaleDateString() },
             { header: "Time", render: (a) => new Date(a.appointmentDate).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) },
             { header: "Duration (min)", render: (a) => `${a.duration} min` },
             {
               header: "Patient",
-              render: (a) => (
-                <div className="flex items-center gap-2">
-                  <Avatar name={a.patientId} size="sm" />
-                  <span className="font-mono text-xs text-(--text)">{a.patientId.slice(0, 8)}</span>
-                </div>
-              ),
+              render: (a) =>
+                a.patientId ? (
+                  <div className="flex items-center gap-2">
+                    <Avatar name={a.patientId} size="sm" />
+                    <span className="font-mono text-xs text-(--text)">{a.patientId.slice(0, 8)}</span>
+                  </div>
+                ) : (
+                  <span className="text-xs text-(--text)">Unbooked</span>
+                ),
             },
             { header: "Status", render: (a) => <Badge status={a.status} /> },
             { header: "Reason", render: (a) => a.reason ?? "—" },
@@ -144,7 +171,7 @@ export default function TodayAppointmentsPage() {
               header: "Actions",
               render: (a) => (
                 <div className="flex flex-col items-start gap-2">
-                  <CompleteAction appointment={a} onDone={() => load()} />
+                  <CompleteAction appointment={a} onDone={() => load(dateFilter)} />
                   <Link
                     to={`/doctor/prescriptions/add?appointmentId=${a.id}`}
                     className="flex items-center gap-1 text-xs font-medium text-(--accent) hover:underline"

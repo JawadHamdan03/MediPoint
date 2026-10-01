@@ -76,6 +76,16 @@ public class DoctorController(IMediator mediator) : ControllerBase
         return Ok(res);
     }
 
+    [Authorize(Roles = "Doctor")]
+    [HttpGet("appointments")]
+    public async Task<IActionResult> GetAppointments([FromQuery] DateOnly? date)
+    {
+        var docId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        var res = await mediator.Send(new GetDoctorAppointmentsQuery(Guid.Parse(docId!), date));
+        return Ok(res);
+    }
+
 
     [Authorize(Roles = "Doctor")]
     [HttpPost("add-prescription")]

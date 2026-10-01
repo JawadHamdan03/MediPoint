@@ -14,6 +14,11 @@ export function getTodaysAppointments(): Promise<AppointmentResponse[]> {
   return apiFetch<AppointmentResponse[]>("/api/Doctor/get-Appointments-today");
 }
 
+/** @param date Optional yyyy-MM-dd filter; omit to fetch every appointment for the doctor. */
+export function getAppointments(date?: string): Promise<AppointmentResponse[]> {
+  return apiFetch<AppointmentResponse[]>(`/api/Doctor/appointments${date ? `?date=${date}` : ""}`);
+}
+
 export function addPrescription(request: PrescriptionRequest): Promise<PrescriptionResponse> {
   return apiFetch<PrescriptionResponse>("/api/Doctor/add-prescription", { method: "POST", body: request });
 }
