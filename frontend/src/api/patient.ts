@@ -1,4 +1,4 @@
-import { apiFetch } from "./client";
+import { apiFetch, apiFetchBlob } from "./client";
 import type {
   AddReviewRequest,
   CancelAppointmentRequest,
@@ -49,4 +49,8 @@ export function addReview(appointmentId: string, request: AddReviewRequest): Pro
 
 export function getDoctorReviews(doctorId: string): Promise<ReviewResponse[]> {
   return apiFetch<ReviewResponse[]>(`/patients/doctors/${doctorId}/reviews`);
+}
+
+export function getPrescriptionPdf(prescriptionId: string): Promise<Blob> {
+  return apiFetchBlob(`/patients/prescriptions/${prescriptionId}/pdf`);
 }

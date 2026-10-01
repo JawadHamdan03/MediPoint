@@ -22,6 +22,7 @@ using MediPoint.Application.Features.Patients.AddReview;
 using MediPoint.Application.Features.Patients.AddReview.DTOs;
 using MediPoint.Application.Features.Patients.GetDoctorReviews;
 using MediPoint.Application.Features.Patients.GetMyAppointments;
+using MediPoint.Application.Features.Users.GetPrescriptionPdf;
 
 namespace MediPoint.Api.Controllers;
 
@@ -140,6 +141,15 @@ public class PatientController(IMediator mediator) : ControllerBase
     {
         var res = await mediator.Send(new GetDoctorReviewsQuery(doctorId));
         return Ok(res);
+    }
+
+    [Authorize(Roles = "Patient")]
+    [HttpGet("prescriptions/{prescriptionId}/pdf")]
+    public async Task<IActionResult> GetPrescriptionPdf(Guid prescriptionId)
+    {
+        var patientId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var pdf = await mediator.Send(new GetPrescriptionPdfQuery(prescriptionId, Guid.Parse(patientId!), "Patient"));
+        return File(pdf, "application/pdf", "prescription.pdf");
     }
 
     [Authorize(Roles = "Patient")]

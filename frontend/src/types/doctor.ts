@@ -11,6 +11,7 @@ export interface AppointmentResponse {
 }
 
 export interface PrescriptionRequest {
+  diagnosis: string;
   notes: string;
   appointmentId: string;
   medicineName: string;
@@ -25,6 +26,7 @@ export interface PrescriptionRequest {
 }
 
 export interface PrescriptionResponse {
+  diagnosis: string;
   notes: string;
   medicines: Medicine[];
   labResults: LabResult[];

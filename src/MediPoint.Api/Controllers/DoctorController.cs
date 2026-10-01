@@ -18,6 +18,7 @@ using MediPoint.Application.Features.Doctors.GenerateAppointmentSlots.DTOs;
 using MediPoint.Application.Features.Doctors.ForgotPassword;
 using MediPoint.Application.Features.Doctors.ResetPassword;
 using MediPoint.Application.Features.Patients.GetDoctorReviews;
+using MediPoint.Application.Features.Users.GetPrescriptionPdf;
 
 namespace MediPoint.Api.Controllers;
 
@@ -108,6 +109,15 @@ public class DoctorController(IMediator mediator) : ControllerBase
         var docId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         var res = await mediator.Send(new CompleteAppointmentCommand(appointmentId, Guid.Parse(docId!), request.Notes));
         return Ok(res);
+    }
+
+    [Authorize(Roles = "Doctor")]
+    [HttpGet("prescriptions/{prescriptionId}/pdf")]
+    public async Task<IActionResult> GetPrescriptionPdf(Guid prescriptionId)
+    {
+        var docId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var pdf = await mediator.Send(new GetPrescriptionPdfQuery(prescriptionId, Guid.Parse(docId!), "Doctor"));
+        return File(pdf, "application/pdf", "prescription.pdf");
     }
 
     [Authorize(Roles = "Doctor")]

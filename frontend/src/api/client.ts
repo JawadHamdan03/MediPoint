@@ -66,7 +66,7 @@ async function rawFetch(path: string, options: RequestOptions, token: string | n
   });
 }
 
-export async function apiFetch<T>(path: string, options: RequestOptions = {}): Promise<T> {
+async function fetchWithAuth(path: string, options: RequestOptions): Promise<Response> {
   const requiresAuth = options.auth !== false;
   const token = requiresAuth ? (authHooks?.getAccessToken() ?? null) : null;
 
@@ -85,9 +85,21 @@ export async function apiFetch<T>(path: string, options: RequestOptions = {}): P
     throw new ApiError(res.status, await parseProblem(res));
   }
 
+  return res;
+}
+
+export async function apiFetch<T>(path: string, options: RequestOptions = {}): Promise<T> {
+  const res = await fetchWithAuth(path, options);
+
   if (res.status === 204) {
     return undefined as T;
   }
 
   return (await res.json()) as T;
+}
+
+/** For endpoints that return a binary file (e.g. a generated PDF) instead of JSON. */
+export async function apiFetchBlob(path: string, options: RequestOptions = {}): Promise<Blob> {
+  const res = await fetchWithAuth(path, options);
+  return res.blob();
 }

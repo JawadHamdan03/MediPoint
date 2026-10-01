@@ -14,6 +14,10 @@ public class AddPrescriptionCommandValidator : AbstractValidator<AddPrescription
         RuleFor(x => x.PrescriptionRequest.AppointmentId)
             .NotEmpty().WithMessage("Appointment ID is required.");
 
+        RuleFor(x => x.PrescriptionRequest.Diagnosis)
+            .NotEmpty().WithMessage("Diagnosis is required.")
+            .MaximumLength(500).WithMessage("Diagnosis cannot exceed 500 characters.");
+
         RuleFor(x => x.PrescriptionRequest.Notes)
             .MaximumLength(2000).WithMessage("Notes cannot exceed 2000 characters.");
 

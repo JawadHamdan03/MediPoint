@@ -9,6 +9,8 @@ namespace MediPoint.Application.Features.Doctors.AddPrescription.DTOs;
 
 public class PrescriptionRequest
 {
+    public string Diagnosis { get; set; } = null!;
+
     public string Notes { get; set; } = "";
 
     public List<Medicine> Medicines { get; set; } = [];

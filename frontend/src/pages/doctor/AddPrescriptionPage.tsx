@@ -14,6 +14,7 @@ import { useToast } from "../../context/ToastContext";
 
 function initial(appointmentId: string): PrescriptionRequest {
   return {
+    diagnosis: "",
     notes: "",
     appointmentId,
     medicineName: "",
@@ -70,6 +71,16 @@ export default function AddPrescriptionPage() {
             value={form.appointmentId}
             error={fields.appointmentid}
             onChange={(e) => update("appointmentId", e.target.value)}
+          />
+        </div>
+        <div className="sm:col-span-2">
+          <Input
+            label="Diagnosis"
+            required
+            maxLength={500}
+            value={form.diagnosis}
+            error={fields.diagnosis}
+            onChange={(e) => update("diagnosis", e.target.value)}
           />
         </div>
         <div className="sm:col-span-2">

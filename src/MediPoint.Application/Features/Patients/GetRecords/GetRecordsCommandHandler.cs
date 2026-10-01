@@ -38,6 +38,7 @@ public class GetRecordsCommandHandler(IAppDbContext dbContext,IMemoryCache memor
             pres.Medicines = medicines.ToList();
 
             var medRes = pres.Adapt<MedicalRecordResponse>();
+            medRes.PrescriptionId = pres.Id;
             medRes.DoctorName = pres.Doctor.FirstName+" "+pres.Doctor.LastName;
             
             medicalRecordResponses.Add(medRes);

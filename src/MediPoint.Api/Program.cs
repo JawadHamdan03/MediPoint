@@ -9,6 +9,17 @@ using MediPoint.Infrastructure.Common.Jobs;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
+using QuestPDF.Infrastructure;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Serializers;
+
+QuestPDF.Settings.License = LicenseType.Community;
+
+// MongoDB.Driver 3.x no longer defaults Guid serialization to a concrete representation;
+// without this, any entity with a Guid property (Medicine, LabResult, MedicalRecord) throws
+// BsonSerializationException on insert.
+BsonSerializer.RegisterSerializer(typeof(Guid), new GuidSerializer(GuidRepresentation.Standard));
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,6 +47,7 @@ builder.Services.AddScoped<IJwtTokenServiceProvider, JwtTokenServiceProvider>();
 
 builder.Services.Configure<FrontendSettings>(builder.Configuration.GetSection("Frontend"));
 builder.Services.AddTransient<IAppUrlProvider, AppUrlProvider>();
+builder.Services.AddTransient<IPrescriptionPdfGenerator, QuestPdfPrescriptionGenerator>();
 
 builder.Services.AddOpenAiChatClient(builder.Configuration);
 builder.Services.AddOpenApi();

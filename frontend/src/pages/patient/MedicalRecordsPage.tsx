@@ -1,13 +1,16 @@
 import { useEffect, useState } from "react";
-import { getMedicalRecords } from "../../api/patient";
+import { getMedicalRecords, getPrescriptionPdf } from "../../api/patient";
 import type { MedicalRecordResponse } from "../../types/patient";
 import { Card } from "../../components/ui/Card";
+import { Button } from "../../components/ui/Button";
 import { Skeleton } from "../../components/ui/Skeleton";
 import { Avatar } from "../../components/ui/Avatar";
 import { PageHeader } from "../../components/ui/PageHeader";
-import { PillIcon, RecordsIcon } from "../../components/ui/icons";
+import { DownloadIcon, PillIcon, RecordsIcon } from "../../components/ui/icons";
 import { ErrorList } from "../../components/ui/ErrorList";
 import { formatError } from "../../lib/formatError";
+import { downloadBlob } from "../../lib/downloadBlob";
+import { useToast } from "../../context/ToastContext";
 
 function RecordCardSkeleton() {
   return (
@@ -22,12 +25,26 @@ function RecordCardSkeleton() {
 export default function MedicalRecordsPage() {
   const [records, setRecords] = useState<MedicalRecordResponse[] | null>(null);
   const [errors, setErrors] = useState<string[]>([]);
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const { notify } = useToast();
 
   useEffect(() => {
     getMedicalRecords()
       .then(setRecords)
       .catch((err) => setErrors(formatError(err)));
   }, []);
+
+  async function handleDownload(prescriptionId: string) {
+    setDownloadingId(prescriptionId);
+    try {
+      const blob = await getPrescriptionPdf(prescriptionId);
+      downloadBlob(blob, "prescription.pdf");
+    } catch (err) {
+      notify(formatError(err).join(" "), "error");
+    } finally {
+      setDownloadingId(null);
+    }
+  }
 
   return (
     <div className="flex flex-col gap-4">
@@ -56,6 +73,15 @@ export default function MedicalRecordsPage() {
             <div className="flex items-center gap-2 text-sm text-(--text)">
               <Avatar name={r.doctorName} size="sm" />
               Dr. {r.doctorName}
+              <Button
+                variant="secondary"
+                className="px-2.5 py-1.5"
+                disabled={downloadingId === r.prescriptionId}
+                onClick={() => handleDownload(r.prescriptionId)}
+              >
+                <DownloadIcon className="h-4 w-4" />
+                {downloadingId === r.prescriptionId ? "Downloading…" : "PDF"}
+              </Button>
             </div>
           </div>
           {r.notes && <p className="mt-1 text-sm text-(--text)">{r.notes}</p>}
